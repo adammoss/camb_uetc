@@ -1,0 +1,815 @@
+%JZ had it last
+%\documentclass[prd,aps,tightenlines]{revtex4}
+%\documentclass[twocolumn,prd,aps,showpacs,superscriptaddress]{revtex4}
+\documentclass[twocolumn,aps,prd,showpacs]{revtex4}
+%\usepackage{natbib}
+\usepackage{amsmath}
+%\usepackage{verbatim}
+%\usepackage{dcolumn}
+\usepackage{graphicx}
+\usepackage[usenames]{color}
+%\usepackage{psfrag}
+
+% ---------------- May need to comment this out ----------------
+%\usepackage{epstopdf}
+%\usepackage{amsbsy,amssymb,amsmath}
+%\usepackage{rotating}
+
+\usepackage{psfrag}
+\usepackage[ps2pdf,colorlinks,bookmarks]{hyperref}
+%\usepackage{hyperref}
+\definecolor{linkblue}{rgb}{0,0,0.8}
+\definecolor{linkgreen}{rgb}{0,0.5,0}
+\hypersetup{pdfpagemode=None, pdfstartview=FitH, linkcolor=linkblue, %
+             citecolor=linkgreen, urlcolor=linkblue}
+\newcommand{\note}[1]{{\color{red}[#1]}}
+%\newcommand{\note}[1]{{[#1]}}
+
+\bibliographystyle{doiarxiv}
+%\bibliographystyle{prsty}
+
+\def\nlb{\nolinebreak}
+\newcommand{\ud}[2]{^{#1}_{\phantom{#1}#2}}
+\newcommand{\du}[2]{_{#1}^{\phantom{#1}#2}}
+\newcommand{\udu}[3]{^{#1\phantom{#2}#3}_{\phantom{#1}#2}}
+\newcommand{\udud}[4]{^{#1\phantom{#2}#3}_{\phantom{#1}#2\phantom{#3}#4}}
+\newcommand{\uds}[2]{^{#1{\rm(s)}}_{\phantom{#1}#2}}
+\newcommand{\udv}[2]{^{#1{\rm(v)}}_{\phantom{#1}#2}}
+\newcommand{\udt}[2]{^{#1{\rm(t)}}_{\phantom{#1}#2}}
+\def\beq{\begin{equation}}
+\def\eeq{\end{equation}}
+\def\bea{\setlength\arraycolsep{1.4pt}\begin{eqnarray}}
+\def\eea{\end{eqnarray}}
+\def\bit{\begin{itemize}}
+\def\eit{\end{itemize}}
+\def\dsp{\displaystyle}
+\def\etal{{\it et~al.}}
+\def\ie{{\it i.e.}}
+\def\eg{{\it e.g.}}
+\def\vs{{\it vs.}}
+\def\eq{Eq.~}
+\def\eqs{Eqs.~}
+\def\fig{Fig.~}
+\def\figs{Figs.~}
+\def\pd{\partial}
+\def\lap{\nabla^2}
+\def\lapp{\fr{1}{a^2}\nabla^2}
+\def\sdot{^{\displaystyle\cdot}}
+\def\ld{\left}
+\def\rd{\right}
+\def\ra{\rightarrow}
+\def\tl{\tilde}
+\def\wtl{\widetilde}
+\def\ph{\phantom}
+\def\fr{\frac}
+\def\oo{\frac{1}}
+\def\half{\frac{1}{2}}
+\def\const{{\rm const}}
+\def\gam{\gamma}
+\def\gamd{\dot{\gamma}}
+\def\del{\delta}
+\def\kap{\kappa}
+\def\lam{\lambda}
+\def\Lam{\Lambda}
+\def\vphi{\varphi}
+\def\vphid{\dot{\varphi}}
+\def\vphidd{\ddot{\varphi}}
+\def\rhod{\dot{\rho}}
+\def\sig{\sigma}
+\def\Sig{\Sigma}
+\def\om{\omega}
+\def\ad{\dot{a}}
+\def\add{\ddot{a}}
+\def\aoan{\frac{a}{a_0}}
+\def\hd{\dot{H}}
+\def\gmn{g_{\mu\nu}}
+\def\tmn{T_{\mu\nu}}
+\def\lpl{l_{\rm P}}
+\def\mpl{m_{\rm P}}
+\def\rg{\sqrt{g}}
+\def\Rs{{}^{(3)}\!R}
+\def\liexi{{\cal L}_\xi}
+\def\h{{\cal H}}
+\def\K{{\cal K}}
+\def\L{{\cal L}}
+\def\O{{\cal O}}
+\def\p{{\cal P}}
+\def\phidot{\dot{\varphi}}
+\def\delphi{\delta\varphi}
+\def\delphid{\delta\dot{\varphi}}
+\def\bra{\langle}
+\def\ket{\rangle}
+\def\sh{super-Hubble}
+\def\ds{de Sitter}
+
+\def\ehat{\boldsymbol{\hat{e}}}
+\def\khat{\boldsymbol{\hat{k}}}
+\def\alm{a_{\ell m}}
+\def\Ylm{Y_{\ell m}}
+\def\Cl{C_\ell}
+\def\bk{{\boldsymbol{k}}}
+\def\bx{{\boldsymbol{x}}}
+\def\R{{\cal R}}
+\def\PR{{\cal P_{\cal R}}}
+\def\rls{r_{\rm LS}}
+\def\jl{j_\ell}
+
+%%Table stuff
+%\newbox\tablebox    \newdimen\tablewidth
+%\def\leaderfil{\leaders\hbox to 5pt{\hss.\hss}\hfil}
+%\def\endtablenow{\tablewidth=\columnwidth
+%    $$\hss\copy\tablebox\hss$$
+%    \vskip-\lastskip\vskip -2pt}
+%\def\endtablewide{\tablewidth=\textwidth
+%    $$\hss\copy\tablebox\hss$$
+%    \vskip-\lastskip\vskip -2pt}
+%\def\tablenote#1 #2\par{\begingroup \parindent=0.8em
+%    \abovedisplayshortskip=0pt\belowdisplayshortskip=0pt
+%    \noindent
+%    $$\hss\vbox{\hsize\tablewidth \hangindent=\parindent \hangafter=1 \noindent
+%    \hbox to \parindent{\sup{\rm #1}\hss}\strut#2\strut\par}\hss$$
+%    \endgroup}
+%\def\doubleline{\vskip 3pt\hrule \vskip 1.5pt \hrule \vskip 5pt}
+
+
+\begin{document}
+
+\title{}
+
+
+\date{\today}
+
+
+\maketitle
+
+
+
+
+
+%----------------- INTRODUCTION -----------------------
+\section{Introduction}
+\note{To be completely rewritten}  
+
+The parameters which describe the standard model of cosmology
+(see e.g.~\cite{scott06}) are usually considered to be constants,
+i.e.\ it is assumed that their values are homogeneous in
+space.  However, there are several situations in which we might consider
+spatial variations in these parameters.  Firstly, the structure within our
+observable Universe is a realization of an underlying power spectrum.  This
+means that there is some stochasticity, even on the scale of our Hubble patch,
+leading to a monopole fluctuation in the temperature of the cosmic microwave
+background (CMB)~\cite{Zibin:2008fe} and other parameters.  Secondly,
+there could be some physical process operating on large scales which makes
+some parameters vary from place to place---two obvious examples are
+inhomogeneous big bang
+nucleosynthesis (e.g.~\cite{Harrison}) and anisotropic inflation
+\cite{Gordon:2005ai,Ackerman:2007nb,Pullen:2007tu,Gumrukcuoglu:2007bx}.
+The third type of possibility is to imagine that the laws of physics
+themselves have a dependence on position, for example that the vacuum
+density $\Lambda$ or fine structure constant $\alpha$ might be different in
+different volumes.
+
+In the first scenario, the variations are expected to be small, and are
+part of the conventional cosmological picture, being contained within what
+is usually referred to as ``cosmic variance''.  But in the second and
+third scenarios, the putative physical mechanism is of unknown strength and
+scale.  Hence to test for such ideas we need to keep an open mind and
+develop generic approaches for searching for measurable effects.
+If cosmological parameters (or physical laws) vary on very large scales,
+then we would expect that the most prominent observable effect would be a
+gradient across our Hubble patch.
+
+In Moss, Scott, Zibin, and Battye~\cite{Moss:2010} (MSZB) we discussed a 
+general method for
+searching for such gradients.  This is based on the idea that a gradient
+is equivalent to a dipole modulation of the CMB sky, which in a spherical
+harmonic expansion results in correlations between neighbouring multipoles.
+This idea had been explored earlier by several groups for the specific case
+of modulation of the primordial amplitude of scalar perturbations $A_{\rm s}$
+(see~\cite{Carroll2010} and references therein)
+motivated by the apparent hemispheric asymmetry of the CMB sky
+\cite{Eriksen:2003db,Eriksen:2007pc}.
+The mathematics is also similar to that for the case of aberration of the
+CMB sky, as described in several recent papers
+\cite{Kosowsky:2010jm,Amendola:2010ty,Chluba:2011}.
+However, the appealing
+aspect of the idea is that it is quite generic, and can be used to test
+for a gradient in {\it any\/} parameter.
+
+In this paper we will develop this idea further.
+We begin in the next section by
+briefly describing the method used to measure correlations
+on the CMB sky caused by dipole modulation. For some parameters (e.g.\ $\alpha$)
+this does not result in the generation of an actual
+$\ell=1$ mode. However, it is important to note that even though 
+other parameters (such as $A_{\rm s}$) may generate such a temperature dipole, 
+this is 
+a non-linear effect, and so the size of such a mode is still very small compared 
+with our motion-induced dipole. Hence there is typically no strong
+constraint on gradients from the measured amplitude of the dipole itself---the 
+limits come from measuring the correlations between
+$\ell$ and $\ell\pm1$.  After describing the method we then show some
+simulated results.  Our detailed formalism is described in Sec.~\ref{sec:cov}.
+In Sec.~\ref{sec:fisher} we
+show how one can use a Fisher matrix approach to estimate how well future CMB
+experiments could constrain a tilt in parameters.  We also distinguish the
+case where there might be more than one gradient, in different directions, and show
+that this case requires only a simple modification to the case of a single gradient 
+across our sky.
+In Sec.~\ref{sec:wmap} we examine Wilkinson Microwave Anisotropy Probe 
+({\it WMAP\/}) data, finding some evidence of a dipole modulation.
+%[LAST SENTENCE TO FINISH INTRO?]
+
+It is clear that the expectation value 
+of the temperature is $0$ at both poles, but the variance at each is 
+different. Thus any temperature dipole is at most a second moment effect and
+will be much smaller than the dipole caused by our
+motion, which has $|a_{1m}|^2\simeq10^4 |a_{\ell m}|^2$ for $\ell>1$.
+It is also important to note that gradients in some parameters produce no
+dipole at all.  Taking $\alpha$ as an example,
+the imprint on the CMB arises entirely from a 
+modification of recombination physics.  This gives an epoch of last 
+scattering which is anisotropic, but this does not produce a temperature
+dipole.  An increase in $\alpha$ increases the recombination rate, causing
+recombination to occur at \emph{both} a higher temperature and redshift
+(see MSZB), so that the observed temperature in that direction is
+unchanged.
+
+Evidence for a dipolar power asymmetry (i.e.\ the case $X = A_{\rm s}$)
+in the {\em WMAP\/} 
+data was noticed soon after the initial data release (see 
+e.g.~\cite{Eriksen:2003db,Prunet:2004zy}).  The claimed significance of
+detection has mildly increased with subsequent data releases.
+Recently, two groups have studied the scale-dependence of the signal by 
+limiting the likelihood to some $\ell_{\rm max}$
+\cite{Hoftuft:2009rq,Hanson:2009gu}, for example the first group used an
+exact Bayesian analysis, truncating at $\ell_{\rm max} = 64$ and found
+$\Delta A_{\rm s}/A_{\rm s} = 0.072 \pm 0.022$ 
+pointing towards $(l,b)=(224^{\circ},-22^{\circ})$, with an uncertainty
+of $\pm 24^{\circ}$. 
+
+The result of Ref.~\cite{Hoftuft:2009rq} is the detection of hemispherical
+asymmetry at $3.3\sigma$ significance, but they also found hints of departures
+from the $\ell$-dependence expected from modulating $X = A_{\rm s}$.  In
+Ref.~\cite{Hanson:2009gu} this was extended to higher $\ell$ using an
+approximate quadratic likelihood estimator, finding consistent results, albeit
+at lower significance.   Note, however, that the statistical significance of
+both of these results has been criticized in Ref.~\cite{Bennett:2010jb},
+due to the {\it a posteriori} choice of $\ell_{\rm max}$.
+
+
+
+
+%-----------------------GENERAL COVARIANCE--------------------------------
+\section{Covariance matrix from parameter gradient}
+\label{sec:cov}
+
+We assume that there
+is negligible spatial variation of each parameter 
+inside the Hubble radius at the time of recombination,
+so that the gradient can be 
+considered a first-order perturbation.  We are therefore able to
+calculate the anisotropy power spectra as a function of the cosmological
+parameters, where we are considering that some parameters have a
+dipolar variation over the sky, i.e.\ at last scattering parameter $X$ 
+takes the form
+\beq
+X({\hat{\bf{n}}}) = X_0 + \Delta X\hat{\bf{n}}\cdot\hat{\bf{m}},
+\eeq
+where ${\hat{\bf{n}}}$ is the direction to the last scattering surface and 
+${\hat{\bf{m}}}$ is the gradient direction.  The parameter takes the monopole 
+or average value $X_0$ at the ``equator'', 
+$\hat{\bf{n}}\cdot\hat{\bf{m}} = 0$, and the extreme values $X_0 \pm\Delta X$ 
+at the ``poles'', ${\hat{\bf{n}}} = \pm{\hat{\bf{m}}}$.
+
+%Let us consider how such a dipole would manifest itself on the CMB sky.
+%For convenience, we represent the temperature anisotropies
+%$\Theta({{\hat{\bf{n}}}})$ as an expansion in spherical harmonics:
+%\beq
+% \Theta({{\hat{\bf{n}}}})=\sum_{\ell=1}^{\infty}
+%  \sum_{m=-\ell}^{\ell} a_{\ell m} Y_{\ell m }({{\hat{\bf{n}}}}) \,.
+%\eeq
+%For a small amplitude gradient in some parameter
+%we expect the observed sky to consist of the sum of an isotropic sky 
+%and a dipole modulated sky.
+%
+%The effect is similar in appearance to the boosting effects (or aberration) 
+%due to our motion with respect to the CMB~\cite{Chluba:2011}.
+
+   Generalizing the formalism developed in MSZB for a parameter gradient 
+in an arbitrary direction, we can decompose the gradient into dipolar 
+spherical harmonic components according to
+\beq
+\Delta X_m(\hat{\bf{m}}) \equiv \sqrt{\frac{4\pi}{3}}\Delta X\,Y_{1m}^*(\hat{\bf{m}}).
+\eeq
+In particular, we have
+\begin{eqnarray}
+\Delta X_0      &=& \Delta X\cos\theta_m\,,\\
+\Delta X_{\pm1} &=& \mp\frac{\Delta X\sin\theta_m}{\sqrt2}e^{\mp i\phi_m}\,,
+\end{eqnarray}
+where $(\theta_m,\phi_m)$ are spherical coordinates for $\hat{\bf{m}}$.  
+The modulated harmonic modes are then given by
+\begin{eqnarray}
+\nonumber a_{\ell m} = a_{\ell m}^{\rm iso}
+ + \sqrt{\frac{4\pi}{3}}\sum_M\Delta X_M\sum_{\ell'}
+   \sum_{m'=-\ell'}^{\ell'}\frac{da_{\ell'm'}^{\rm iso}}{dX}\\
+\times \int d\Omega Y_{\ell m}^*(\hat{\bf{n}})
+   Y_{\ell'm'}(\hat{\bf{n}})Y_{1,M}(\hat{\bf{n}})\, ,
+\end{eqnarray}
+where $a_{\ell m}^{\rm iso}$ are the statistically isotropic modes.  
+The integral is evaluated using the Gaunt formula (see e.g.~\cite{Grad:1994}) 
+to yield
+\begin{eqnarray}
+a_{\ell m} &=& a_{\ell m}^{\rm iso} + \sum_M\Delta X_M
+   \sum_{\ell'm'}\frac{da_{\ell'm'}^{\rm iso}}{dX}\xi_{\ell m\ell'm'}^M\,.
+\end{eqnarray}
+The coupling coefficients $\xi^M_{\ell m\ell'm'}$ are given by
+\begin{eqnarray}\label{eqn:xi0}
+\xi_{\ell m \ell' m'}^0 &=& \delta_{m'm} \left[ \delta_{\ell' \, \ell-1}
+ A_{\ell-1 \, m} + \delta_{\ell' \, \ell+1} A_{\ell  m}  \right]\,, \\
+\label{eqn:xi1}
+\xi_{\ell m \ell' m'}^{\pm1} &=& \delta_{m' \, m\mp1}
+ \left[ \delta_{\ell' \, \ell-1} B_{\ell-1 \, \pm m-1} - \delta_{\ell' \, \ell+1}
+ B_{\ell  \, \mp m}  \right]\,,
+\end{eqnarray}
+where
+\begin{eqnarray}
+A_{\ell m} &\equiv& \sqrt{\frac{\left( \ell + 1\right) ^2-m^2}
+{\left( 2\ell+1\right)\left( 2\ell+3\right)}}\,,\\
+\quad B_{\ell m} &\equiv&  \sqrt{\frac{\left(\ell+m+1 \right) \left(\ell+m +2 \right)}
+{2\left( 2\ell+1\right)\left( 2\ell+3\right)}}\,.
+\end{eqnarray}
+
+From this we can compute the anisotropy covariance matrix to first order in 
+$\Delta X$:
+\begin{eqnarray}\label{eq:cov}
+ C_{\ell m\ell^\prime m^\prime}
+  &\equiv&\langle a_{\ell m}^\ast a_{\ell^\prime m^\prime} \rangle\nonumber\\
+ &=& C_{\ell} \delta_{\ell \ell'} \delta_{m m'} + \frac{\delta C_{\ell \ell' }}{2}
+ \sum_M \Delta X^*_M \xi_{\ell m \ell' m'}^M\,,
+\end{eqnarray}
+where
+\beq
+\delta C_{\ell\ell'} \equiv \frac{dC_{\ell}}{dX} + \frac{dC_{\ell'}}{dX}.
+\eeq
+Here $C_\ell \equiv \bra a_{\ell m}^{\rm iso*}a_{\ell m}^{\rm iso}\ket$ is the 
+isotropic power spectrum.
+
+%While the above covariance derivation
+%is valid for arbitrary physical parameters, one has to be careful when
+%considering parameters which produce isocurvature modes.
+%Such gradients would produce an ``intrinsic'' non-negligible dipole in the CMB and 
+%could include line of sight effects which have not been investigated here.
+%Our method assumes that the gradient affects only the generation of {\em primary\/} 
+%anisotropies (i.e.\ anisotropies generated at last scattering).
+%We consider four parameters in our analysis: $\alpha$;
+%the amplitude and spectral index of the primordial fluctuations,
+%$A_{\rm s}$ and $n_{\rm s}$; as well as the primordial helium fraction
+%$Y_{\rm p}$.  Unlike for the parameters of the standard cosmological model, it
+%is unclear what the basic parameter set might be here.  Some researchers might
+%prefer to stick with the usual cosmological parameters, while others might be
+%more interested in particle physics quantities, such as
+%$m_p/m_e$, other particle couplings, 
+%mass ratios, and mixing angles, the effective 
+%number of neutrino species, etc. 
+%Whatever parameters are selected, one can extract
+%power spectrum derivatives from standard CMB codes; we employed 
+%\textsc{camb}~\cite{Lewis:1999bs}, specifically using the unlensed spectra.
+%To simulate a change in
+%$\alpha$, we adapted the \textsc{recfast} recombination code
+%\cite{Seager:1999bc,Seager:1999km} as described in MSZB.
+%Since gradients in different parameters produce very different derivative
+%power spectra (see Fig.~2 of MSZB for examples), we could in principle
+%differentiate between them. 
+
+
+
+
+
+
+
+%-----------------GRADIENT ESTIMATOR------------------------------------------
+\section{Gradient estimator}
+\label{sec:grad est}
+We would like to use the covariance matrix (\ref{eq:cov}) to determine best 
+fit estimates for parameter gradients. We begin by maximizing the CMB 
+likelihood over the parameter space $\{\Delta X_M\}$. With a Gaussian 
+realization of temperatures, the CMB likelihood function is simply a 
+Gaussian integral
+\begin{eqnarray}
+\mathcal{L}=\frac{1}{\sqrt{2\pi|C|}}e^{-d^\dagger C^{-1}d/2}\, ,
+\end{eqnarray}
+where $d$ is the vector of temperature anisotropy multipoles and $C$ is the 
+covariance matrix.  We can equivalently maximize the log-likelihood function:
+\begin{eqnarray}
+- 2 \ln \mathcal{L} = \ln(2\pi) + \ln |C| + d^{\dagger} C^{-1} d\, ,
+\end{eqnarray}
+which is maximum for a particular $\Delta X_M$ when
+\beq\label{eq:max}
+d^{\dagger} C^{-1} \frac{d C}{d \Delta X_M^{}} C^{-1}  d
+   = {\rm Tr} \left(C^{-1} \frac{d C}{d \Delta X_M^{}}  \right)\,.
+\eeq
+If we include a small anisotropy in the covariance matrix so that $C=C_I+C_A$, 
+then we can expand $C_I^{-1}$ about the fiducial matrix $C_I$:
+\beq
+C^{-1} \approx C^{-1}_I - C_{I}^{-1} C_A C_I^{-1}\, .
+\eeq
+To first order in the anisotropy, Eq.~\eqref{eq:max} becomes
+\begin{eqnarray}\label{eq:maxl}
+&&d^{\dagger} C_I^{-1}\bigg( \frac{d C_A}{d \Delta X_M^{}} C_I^{-1}  d 
+-  \frac{d C_A}{d\Delta X_M^{}} C_I^{-1}  C_A C_I^{-1}  d  - \\
+&&C_A C_I^{-1} \frac{d C_A}{d \Delta X_M^{}} C_I^{-1}  d\bigg) 
++  {\rm Tr} \left( C_{I}^{-1} C_A C_I^{-1} \frac{d C_A}{d \Delta X_M^{}}\right)
+ = 0\,    \nonumber
+\end{eqnarray}
+In terms of the covariance matrix in Eq.~\eqref{eq:cov}, we have, for 
+example, that the $(\ell m),(\ell' m')$ entry of the matrix 
+$C_I^{-1}dC_a/d\Delta X_M C_I^{-1}$ is given by
+\beq
+\frac{\delta C_{\ell'}\xi^M_{\ell m \ell 'm'}}{C_\ell C_{\ell'}}.
+\eeq
+Summing over all matrix entries $(\ell m),(\ell 'm')$, we can re-write the 
+maximum likelihood condition, Eq.~\eqref{eq:maxl}, as
+\begin{eqnarray}
+&&\frac{\delta C_{\ell \ell'}}{C_{\ell} C_{\ell'}}\xi^i_{\ell m \ell' m'}
+ a_{lm}^{\star} a_{\ell' m'}\nonumber \\
+ &=&   \Delta X^{}_{M}  \frac{ \delta C_{\ell \ell'}^2 }{2 C_{\ell} C_{\ell'}} 
+\bigg( \frac{a_{\ell m}^{\star} a_{\ell m}}{C_{\ell}} \xi^M_{\ell m \ell' m'} 
+\xi^i_{\ell' m' \ell m} \nonumber \\
+ &+&  \frac{a_{\ell m}^{\star} a_{\ell m}}{C_{\ell}} \xi^i_{\ell m \ell' m'} 
+\xi^M_{\ell' m' \ell m} + \xi^M_{\ell m \ell' m'} \xi^i_{\ell' m' \ell m}\bigg)\, ,
+\end{eqnarray}
+where repeated indices are implicitly summed over. Since the 
+$\xi^M_{\ell m \ell' m'}$ are orthogonal, we can solve this to obtain estimates 
+for the $\Delta X_M$. Inputing the expressions for $\xi^M_{\ell m \ell' m'}$, 
+Eq.~\eqref{eqn:xi0}, and using the symmetry of the covariance matrix, we get
+\begin{eqnarray}\label{eqn:delXest}
+\Delta X_0^{} &=&  \frac{2 \sum_{\ell m} 
+\frac{\delta C_{\ell \ell+1}}{ C_{\ell}C_{\ell+1}} A_{\ell m}
+  a _{\ell m}^{\star} a_{\ell+1 m}  }{\sum_{\ell m}
+  \frac{\delta C_{\ell \ell+1}^2}{ C_{\ell}C_{\ell+1}} A_{\ell m}^2
+ \left(  \frac{a^{\star}_{\ell m}  a_{\ell m}}{C_{\ell}}
+ + \frac{a^{\star}_{\ell+1 \, m}  a_{\ell+1 \, m}}{C_{\ell+1}}  -1  \right)}
+ \,,\\
+\Delta X_{+1} &=&  \frac{2 \sum_{\ell m} 
+\frac{\delta C_{\ell \ell+1}}{ C_{\ell}C_{\ell+1}} B_{\ell m}
+  a _{\ell m}^{\star} a_{\ell+1 \, m+1}  }{\sum_{\ell m}
+  \frac{\delta C_{\ell \ell+1}^2}{ C_{\ell}C_{\ell+1}} B_{\ell m}^2
+ \left( \frac{a^{\star}_{\ell m}  a_{\ell m}}{C_{\ell}}
+  + \frac{a^{\star}_{\ell+1 \, m+1}  a_{\ell+1 \, m+1}}{C_{\ell+1}}  -1  \right)} \,,
+\end{eqnarray}
+and $\Delta X_{-1}=-\Delta X_{+1}^\star$.
+The best fit gradient parameters are then just
+\begin{eqnarray}\label{eqn:estimates1}
+\Delta X &=& \sqrt{\Delta X_0^2 + 2|\Delta X_1|^2 }\,,\\
+\label{eqn:estimates2}\theta_m &=& \cos^{-1}\left( \Delta X_0/\Delta X\right)\,,\\
+\label{eqn:estimates3}\phi_m &=& \tan^{-1} \left[ - {\rm Im}
+ \left( \Delta X_{+1} \right) / {\rm Re}  \left(\Delta X_{+1} \right)   \right]\,.
+\end{eqnarray}
+In Sec.~\ref{sec:results} we compute these estimates for a  {\em WMAP\/} 
+coadded nine year sky map. For the remainder of the paper, we fix the 
+parameter monopoles $X_0$ to their respective {\it WMAP\/}-9 best-fit 
+values~\cite{Komatsu:2010fb}. 
+
+%We note that inclusion of polarization
+%improves sensitivity by a factor of about two for the aberration
+%effect~\cite{Amendola:2010ty}, and we would expect a similar improvement here.
+
+
+%For our purposes, since we expect
+%$\Delta X/X_{0}$ to be small, we can use $\Delta X/X_{0}=0$ as the fiducial
+%point at which to evaluate the covariance inverse and derivatives.  The
+%derivative matrix is determined using finite differences,
+%and is given explicitly by
+%\beq \label{eqn:deriv}
+% \ld(C_{,\Delta X_{i}}\rd)_{\ell m\ell^\prime m^\prime}=\frac{X_{i0}}{2}
+%  \left( \frac{dC_{\ell}}{dX_{i}} + \frac{dC_{\ell^\prime}}{dX_{i}} \right)
+%  \xi_{\ell m \ell^\prime m^\prime}^{0}\,.
+%\eeq
+%Here $C^{-1}$ is diagonal due to our choice of fiducial point.
+%The product
+%$C^{-1}C_{,\Delta X_{j}}C^{-1}$ can then be simplified so that any entry $p,q$
+%(row $p$, column $q$) is given by
+%\beq\label{eqn:product1}
+% \ld(C^{-1}C_{,\Delta X_{j}}C^{-1}\rd)_{pq}
+%  = C_{pp}^{-1}\ld(C_{,\Delta X_{j}}\rd)_{pq}C_{qq}^{-1},
+%\eeq
+%Pre-multiplying this result by $C_{,\Delta X_{i}}$ yields the final matrix used
+%in the Fisher calculation.  Since the Fisher matrix involves only the trace of
+%this product, we need only compute its diagonal entries.
+
+%We perform the analysis for an ideal cosmic variance-limited experiment,
+%as well as for a more realistic case including experimental noise, with
+%experimental
+%specifications from {\em Planck}~\cite{Efstathiou:1999,PlanckI}.
+%This is done by adding a diagonal noise
+%covariance matrix to the above covariance matrices with entries given by
+%(e.g.~\cite{Foreman:2011uj})
+%\beq\label{eqn:noise}
+% N_{\ell}=\left[\sum_{c}\frac{1}{\theta_{c}(\Delta_{c})^{2}}
+%  \exp\left(-\frac{\ell^{2}\theta_{c}^{2}}{8\ln2}\right)\right]^{-1}.
+%\eeq
+%Here, we take the sum over $c$ to be a sum over the four highest frequency
+%channels of {\it Planck}, $\theta_{c}$ is the FWHM beam size, and
+%$\Delta_{c}$ is the noise per pixel.
+%The Fisher matrices are evaluated out to $\ell=2000$, and we find that the
+%values for {\it Planck\/} are almost indistinguishable from those obtained
+%with an experiment which is cosmic variance limited to that multipole.
+%By considering the diagonal entries of the
+%inverse Fisher matrix, we can estimate errors on each parameter gradient using
+%the Cramer-Rao inequality
+%\beq
+% \sigma (\Delta X_{i}/X_{i})\ge\sqrt{(F^{-1})_{ii}}.
+%\eeq
+%The results are given in Table~\ref{table:errors}.  We see that the gradient in
+%$\alpha$ is more tightly constrained than the other parameters.  This is the
+%result of its unique associated derivative power spectrum (see MSZB).
+
+%\begin{table}
+%\caption{Forecasted errors $\sigma(\Delta X/X)\times10^{-3}$ for
+%$\ell_{\rm max}=2000$.  These are for the parameters of the {\it Planck\/}
+%experiment, although we note that the values we found for a cosmic variance
+%limited experiment only differ in the third or fourth digit.
+%The lower part of the table corresponds to the case where two co-aligned
+%gradients are present on the same sky.}
+%\label {table:errors}
+%\nointerlineskip
+%\setbox\tablebox=\vbox{
+%%
+%\newdimen\digitwidth % These five lines change what an asterisk
+%\setbox0=\hbox{\rm 0} % means to TeX. Instead of meaning
+%\digitwidth=\wd0 % "print an '*' here", it now means "leave
+%\catcode`*=\active % as much blank space as a single number
+%\def*{\kern\digitwidth} % takes up".
+%%
+%\newdimen\signwidth % These five lines change the meaning of an
+%\setbox0=\hbox{{\rm +}} % exclamation mark in the same way, so that it
+%\signwidth=\wd0 % leaves as much space as a plus or minus sign.
+%\catcode`!=\active % These definitions will disappear at the end of
+%\def!{\kern\signwidth} % the \vbox.
+%%
+%\newdimen\pointwidth % These five lines change the meaning of a
+%\setbox0=\hbox{\rm .} % question mark in the same way, so that it
+%\pointwidth=\wd0 % leaves as much space as a period.
+%\catcode`?=\active % These definitions will disappear at the end of
+%\def?{\kern\pointwidth} % the \vbox.
+%%
+%%\halign{\hbox to 1.75in{#\leaderfil}\tabskip=2.0em&
+%\halign{\hbox to 1.75in{#}\tabskip=2.0em&
+%\hfil#\hfil\tabskip=1.0em\cr
+%\noalign{\doubleline}
+%\omit  Parameter &$\sigma\times10^3$ \cr
+%\noalign{\vskip 3pt\hrule\vskip 4pt}
+%$A_{\rm s}$&           *3.7* \cr
+%$n_{\rm s}$&           *6.8* \cr
+%$\alpha$&              *0.25 \cr
+%$Y_{\rm p}$&           35?** \cr
+%\noalign{\doubleline}%{\vskip 3pt\hrule\vskip 4pt}
+%}}
+%\endtablenow
+%\end{table}
+%\begin{table}
+%\caption{Forecasted errors $\sigma(\Delta X/X)\times10^3$ for
+%$\ell_{\rm max}=2000$.  These are for the parameters of the {\it Planck\/}
+%experiment, although we note that the values we found for a cosmic variance
+%limited experiment only differ in the third or fourth digit.
+%\label{table:errors}}
+%\begin{ruledtabular}
+%\begin{tabular}{ccdc}
+%&Parameter $X$&\multicolumn{1}{c}{$\sigma\times10^3$}&\\\hline
+%&$A_{\rm s}$  &           3.7 &\\
+%&$n_{\rm s}$  &           6.8 &\\
+%&$\alpha$     &           0.25&\\
+%&$Y_{\rm p}$  &          35   &
+%\end{tabular}
+%\end{ruledtabular}
+%\end{table}
+
+%To illustrate the correlation between different gradients, we produce
+%confidence ellipses, in two dimensional sub-spaces,
+%marginalizing over the other parameters, as shown in Fig.~\ref{fig:ellipses}.
+%We see that for an experiment reaching $\ell=2000$, degeneracies between parameters
+%are small enough to allow us to distinguish between them at the $10^{-3}$ level.
+%
+%This analysis addresses the case where all four of these gradients co-exist in 
+%the same direction, which is presumed to be known. Note, however, that the errors 
+%given in Table~\ref{table:errors} are completely independent of the actual value 
+%of any such gradients (so long as the gradients are small enough that our 
+%fiducial model of $\Delta X=0$ is valid). In other words, these constraints are 
+%equally applicable if any subset of these four gradients are present, so long 
+%as they lie in the same direction. 
+
+%We might also like to consider the situation 
+%in which different parameters have tilts in different directions.  To simplify 
+%the problem, we consider the case with exactly two different gradients separated
+%by an angle $\theta$. To compute the off-diagonal elements of the new Fisher 
+%matrix, we orient one of the gradients along the polar axis. This will have 
+%exactly the same covariance derivative matrix as previously calculated. For the 
+%other parameter, $\Delta X_{j}$, we must include the full derivative obtained from 
+%the covariance matrix.
+%%\begin {eqnarray}
+%%(C_{,\Delta X_{j}})_{\ell m \ell^\prime m^\prime}&=&\frac{X_{j0}}{2}
+% % \left[ \frac{dC_{\ell}}{dX_{j}} + \frac{dC_{\ell^\prime}}{dX_{j}} \right]\\
+%% &\times& \left[\xi^{0}_{\ell m\ell^\prime m^\prime}\cos\theta
+%%+\frac{\sin\theta}{\sqrt{2}}\bigg(\frac{\xi^{-1}_{\ell m\ell^\prime m^\prime}}
+%%{e^{i\phi}}-\frac{\xi^{+1}_{\ell m \ell^\prime m^%\prime}}{e^{-i\phi}}\bigg)\right]
+%%\nonumber\,\,\,\,
+%Using Eq.~(\ref{eqn:fisher}) one can show that the resultant Fisher matrix 
+%for such a case depends only on the separation angle $\theta$,
+%and not on which parameter we choose to orient along the pole.
+%Now using Eq.~(\ref{eqn:product1}) and the symmetry of the covariance 
+%derivatives, we find that the $m^\prime=m-1$ and $m^\prime=m+1$ off-diagonal 
+%terms do not affect the Fisher matrix.  For the diagonal Fisher components, it 
+%is clear that the computation is identical to what was done originally. Thus 
+%for any two \emph{different} gradients separated by an angle $\theta$,
+%their resultant Fisher matrix $F^\prime_{ij}$ can be computed as
+%\beq
+%F^\prime_{ij}=kF_{ij},
+%\eeq
+%where
+%\beq
+%   k = \left\{
+%     \begin{array}{ll}
+%       1                & i=j,\\
+%       \cos\theta \quad & i\neq j,
+%     \end{array}
+%   \right.
+%\eeq
+%and $F_{ij}$ is our original Fisher matrix marginalized over all parameters 
+%except $X_{i}$ and $X_{j}$.
+
+   To obtain errors one can expand the log-likelihood as a quadratic function 
+around the best-fit.  The Fisher matrix is defined as
+\beq\label{eqn:fisher}
+F_{MM'} \equiv\frac{1}{2}{\rm Tr}\ld(C_{,\Delta X_M}C^{-1}C_{,\Delta X_{M'}}C^{-1}\rd).
+\eeq
+Here $C_{,\Delta X_M}$ denotes the derivative of the covariance matrix with
+respect to the gradient component $\Delta X_M$.  For small $\Delta X$ this is 
+given explicitly by
+\beq
+F_{MM'} \simeq \frac{\delta C_{\ell \ell'}^2}
+{8 C_{\ell} C_{\ell'}}  \xi^M_{\ell m \ell' m'} \xi^{M'}_{\ell' m' \ell m}\,,
+\eeq
+which, after transforming the basis, gives the non-zero terms
+\begin{eqnarray}
+F_{0,0} &=& \frac{1}{4}\sum_{\ell m}
+ \frac{\delta C_{\ell \ell+1}^2}{ C_{\ell} C_{\ell+l}}  A_{\ell m}^2 \,, \\ \nonumber 
+F_{ {\rm Re}(\Delta X_{+1}^{})  {\rm Re}(\Delta X_{+1}^{}) }
+ &=&  \frac{1}{2}\sum_{\ell m} \frac{\delta C_{\ell \ell+1}^2}{ C_{\ell} C_{\ell+l}}
+  B_{\ell m}^2\, ,
+\end{eqnarray}
+with $F_{{\rm Im}(\Delta X_{+1}^{})  {\rm Im}(\Delta X_{+1}^{}) } 
+= F_{ {\rm Re}(\Delta X_{+1}^{})  {\rm Re}(\Delta X_{+1}^{}) }$.  
+Thus from the Cramer-Rao inequality, we can estimate the standard errors as
+\begin{eqnarray} \label{eqn:errorest}
+\sigma_{\Delta X_0^{}} &=& \frac{2}{\sqrt{\sum_{\ell m}
+   \frac{\delta C_{\ell\ell+1}^2}{C_{\ell}C_{\ell+l}} A_{\ell m}^2}}\,,\\\nonumber 
+\sigma_{ {\rm Re}(\Delta X_{+1}^{})  } = \sigma_{ {\rm Im}(\Delta X_{+1}^{})}
+    &=&  \sqrt{\frac{2}{\sum_{\ell m}
+         \frac{\delta C_{\ell \ell+1}^2}{ C_{\ell} C_{\ell+l}}  B_{\ell m}^2}}\,.
+\end{eqnarray}
+
+
+
+
+
+
+
+
+%----------------Results-----------------------
+\section{Results}
+\label{sec:results}
+
+
+
+
+
+
+
+%Estimates of the amplitude and direction of the dipole modulation of power
+%were obtained in section~\ref{sec:grad est}.
+%This is {\it similar\/} to the published searches for modulation of
+%$A_{\rm s}$, except that we would find a signal even if some parameter other
+%than $A_{\rm s}$ was being modulated.
+
+%We determine the parameter $\Delta A_{\rm s}/A_{\rm s}$ for the {\it WMAP\/}-9 data. 
+%Since the Galactic foreground has a strong effect on the signal, we remove 
+%it by applying a $20^\circ$ symmetric cut to the V band map. Ideally, we 
+%would use a temperature mask and an inverse variance filtered map to remove 
+%any multipole coupling induced by the mask. Such a procedure can be found 
+%in Ref.~\cite{Hanson:2009gu}, but it is left for future work to implement 
+%this here. Instead, we test the estimators on random maps with a simulated 
+%gradient in the scalar amplitude, and with symmetric Galactic cuts of 
+%$20^\circ$. We find the cut induces only a small bias with respect to 
+%the Fisher errors derived above. 
+%%In fact, a reasonable scaling for the uncertainty of the estimators due to 
+%%the cut is simply $\sigma_{\rm fisher}/\sqrt{f_{\rm vis}}$
+% %where $f_{\rm vis}$ is the fraction of the sky unmasked.
+%The lack of strong coupling from the mask is not unexpected, since by 
+%construction, it has no dipole component.
+
+%Figure \ref{fig:wmap} shows each of the $\Delta X_i/X$ component estimates 
+%for the {\it WMAP\/}-9 data, where $X=A_s$. Combining these results for 
+%$\ell_{\rm max}=200$ and propagating the errors mentioned above through 
+%equations \eqref{eqn:estimates1}, \eqref{eqn:estimates2}, and 
+%\eqref{eqn:estimates3}, we arrive at the values:
+%\begin{eqnarray}
+%\Delta A_s/A_s &=& 0.076\pm0.014\, ; \\
+%\theta&=& 108^{\circ}\pm7^{\circ}\, ;\\
+%\phi&=& 73^{\circ}\pm 5^{\circ}\, .
+%\end{eqnarray}
+%We note that inclusion of a noise covariance matrix of the form 
+%Eq.~\ref{eqn:noise} with {\em WMAP} experimental parameters has a negligible 
+%effect on the errors listed above. However, while the Galactic cut does not 
+%appreciably bias the signal, it does increase the variance in the noise, 
+%suggesting that the above uncertainties are somewhat underestimated.
+
+%Note that the apparent dipole in
+%$A_{\rm s}$ could be a gradient in many combinations of
+%parameters, as they are highly degenerate at low $\ell_{\rm max}$.
+%On a speculative note, we might also mention that the dependence of the
+%coupling on $\ell$ has roughly the character expected for a gradient in the
+%tensor amplitude $A_{\rm t}$, since the primordial gravity wave contribution
+%to the CMB anisotropies falls off after $\ell\simeq50$.  However, a more sensitive
+%measurement of the dipole modulation would be required in order to decide
+%what parameter combination fits best.
+
+
+
+
+
+
+
+%----------------- CONCLUSIONS -----------------------
+\section{Discussion}
+\note{To be completely rewritten}  
+
+We have shown that, despite partial degeneracies that exist between parameter
+gradients, it should be possible to determine the values of $\Delta X/X$
+causing a dipole modulation, provided that the amplitude is larger than
+about the $10^{-3}$ level. We note that although extending this Fisher
+analysis to any other parameters is straightforward, we cannot predict the 
+effect this would have on the constraints listed above. It is possible that a 
+new parameter could be partially degenerate with
+one of the parameters considered here, for example.
+
+If a gradient does exist at all, then it is possible that there could be
+more than one parameter with a gradient.  These could either be aligned, or
+in different directions, and we have shown how to deal with both cases using
+the formalism of the $\xi^M$ matrices.
+
+In practice the limitation for measuring gradients
+is likely to be systematic effects, rather than
+instrumental noise.  For small $\Delta X$, it 
+may be difficult to distinguish the correlations from those due to 
+the doppler boosting effect.  However, weaker gradients may be detectable 
+in the future using the extra information contained in 21-cm surveys 
+\cite{Lewis:2007kz}.  Still, it will be necessary in future, with more sensitive
+searches for gradients, to fully account for the correlations due to
+foregrounds and masking, as well as other systematics.
+
+%[I THINK WE SHOULD LOSE THIS PARAGRAPH]
+%In addition, for some parameters 
+%(such as $\alpha$), it is possible that a gradient may generate a 
+%temperature dipole through the effect of the parameter on epochs prior to
+%recombination (e.g.\ reheating).  
+%Although the details would be model dependent, we 
+%would expect that the generated temperature dipole would be of order 
+%$\Delta X/X_0$, and hence, for the {\it Planck\/} limit, of $\sigma (\Delta 
+%X/X_0) \approx 10^{-3}$, 
+%will likely be negligible in comparison with the observed 
+%(locally generated) temperature dipole.  In other words, the effects 
+%of the gradient {\em local} to the LSS are expected to be larger 
+%than any effects at very early times.
+
+Spatial variation of fundamental constants has
+been considered before (e.g.~\cite{BarrowOToole01,Donoghue03,Sigurdson03}),
+but in MSZB we showed how a gradient across our Hubble patch generically
+gives rise to correlations between neighbouring multipoles in the CMB 
+anisotropy spectrum.  
+In this paper we have used the same approach to investigate current data from
+{\it WMAP}.  We have also extended the analysis to show how one can consider
+degeneracies among parameters, even if the gradients are in different
+directions.
+
+There is of course no reason to {\it expect\/} such gradients to exist at
+measurable levels.  Nevertheless, the search for gradients is straightforward
+and requires the same data which are required for more conventional
+studies of cosmological parameters.  {\it If\/} a convincing gradient was
+found it would be extremely important as an indicator of exotic early Universe
+physics.
+
+
+
+
+%----------------- ACKNOWLEDGMENTS -----------------------
+\section*{Acknowledgments} 
+%{\em Acknowledgments.---}% 
+This research was supported by the Natural Sciences and Engineering 
+Research Council of Canada and the Canadian Space Agency.
+
+
+\bibliography{acrossU}
+
+\end{document}
+
