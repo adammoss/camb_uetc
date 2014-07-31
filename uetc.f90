@@ -10,6 +10,7 @@ module uetc
   implicit none
   integer, parameter :: DP = kind(1.0D0)
   integer, parameter :: QP = kind(1.0Q0)
+  real(DP), parameter :: pi = 3.1415926535897932384626433832795d0
   ! Whether to use gridded I1 and I4
   logical :: use_grid = .true.
   real(DP), parameter :: taustart_string = 1.0d0
@@ -21,6 +22,7 @@ module uetc
   real(DP), parameter :: xmin = 0.05d0
   real(DP), parameter :: xmax = 20.0d0
   real(DP), parameter :: etcmin = 0.001d0
+  real(DP), parameter :: xapr = 1.0d0
   real(DP) :: weighting = 0.0d0
   real(DP) :: ktau_min,ktau_max,dktau,dx_grid
   integer :: nktau
@@ -709,6 +711,16 @@ contains
        return
     end if
 
+    if (abs(x1-x2).ge.xapr) then
+       !Use Ed's approximation
+       if (uetc_feedback.gt.1) write(*,*) 'Using Eds Approximation'
+       xp=(x1+x2)/2.0d0
+       xm=(x1-x2)/2.0d0
+       I1 = I1_int_a(min(x1,x2),rho)
+       I4 = I4_int_a(min(x1,x2),rho)
+
+    else
+
     nterms = max(min_terms,int(scale_terms*xp))
     if(uetc_feedback.gt.1) write(*,*) 'N terms:',nterms
 
@@ -729,6 +741,7 @@ contains
           I1 = I1_int(xm,rho,nterms)-I1_int(xp,rho,nterms)
           I4 = I4_int(xm,rho,nterms)-I4_int(xp,rho,nterms)
        end if
+    end if
     end if
     I2 = I2_int(xm,rho)-I2_int(xp,rho)
     I3 = I3_int(xm,rho)-I3_int(xp,rho)
@@ -800,6 +813,14 @@ contains
     end do
   end function I1_int
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ function I1_int_a(x,rho)
+    implicit none
+    real(DP) I1_int_a
+    real(DP) x,rho,J0_rho
+    J0_rho = BESSEL_JN(0,rho)
+    I1_int_a = (pi*x/2.0d0)*J0_rho
+ end function I1_int_a
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  function I2_int(x,rho)
     implicit none
     real(DP) I2_int
@@ -832,6 +853,14 @@ contains
        I4_int = I4_int + term
     end do
   end function I4_int
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ function I4_int_a(x,rho)
+   implicit none
+   real(DP) I4_int_a
+   real(DP) x,rho,J1_rho
+   J1_rho = BESSEL_JN(1,rho)
+   I4_int_a = (pi*x*J1_rho)/(2.0d0*rho)
+ end function I4_int_a
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  function I5_int(x,rho)
     implicit none
