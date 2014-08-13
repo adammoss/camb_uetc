@@ -1,0 +1,7 @@
+output/data/*
+output/cmbact_data
+*.mod
+*.a
+*.o
+*~
+camb

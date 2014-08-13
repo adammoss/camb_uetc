@@ -31,19 +31,19 @@ c subroutine initlval in this code.
       common/seed/iseed
       common/volcom/tkmax     
 
-      open(unit=65,file='cl_tt.d',
+      open(unit=65,file='cl_tt_100.d',
      &	            status='unknown',form='formatted')
      
-      open(unit=66,file='cl_te.d',
+      open(unit=66,file='cl_te_100.d',
      &	            status='unknown',form='formatted')
      
-      open(unit=67,file='cl_ee.d',
+      open(unit=67,file='cl_ee_100.d',
      &	            status='unknown',form='formatted')
 
-      open(unit=70,file='cl_bb.d',
+      open(unit=70,file='cl_bb_100.d',
      &	            status='unknown',form='formatted')
 
-      open(unit=80,file='pk_lin.d',
+      open(unit=80,file='pk_lin_100.d',
      &	            status='unknown',form='formatted')
 
 c      write(*,*)'hello'
@@ -55,7 +55,7 @@ c the string tension (the most important parameter)
 c       gmu=0.0d0
 
 c the number of string network realizations (>100 is good)
-      nexp=1000
+      nexp=100
       
 c if string tension is zero, evaluate inflationary spectrum      
       if (gmu.eq.0.0d0) nexp=1
@@ -64,16 +64,16 @@ c maximum l to output (<= number used in jlgen.dat, currently 3000)
       lmaxout=3000
 
 c Omega_B h^2
-      ob=0.0226d0
+      ob=0.02249d0
       
 c Omega_M h^2      
       om=0.112d0
       
 c Hubble const      
-      h=0.70d0
+      h=0.704d0
       
 c Constant effective wiggliness parameter                  
-      alf=1.d0
+      alf=1.9d0
 
 c vdev is the initial rms string velocity (over all scales)
       vdev=0.65d0

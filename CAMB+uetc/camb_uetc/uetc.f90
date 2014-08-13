@@ -50,7 +50,6 @@ module uetc
   real(DP), allocatable :: x_array_grid(:),log_x_array_grid(:)  
   real, allocatable :: I1_grid(:,:,:),I4_grid(:,:,:)
   character(len=100) :: grid_root='/home/adammoss/work/code/string/grid/'
-  Type(StringParams) :: SPR_rad,SPR_mat
   logical :: output_uetc = .false.
   integer :: nmodes
   logical :: do_diagonalize = .false.
@@ -59,8 +58,8 @@ module uetc
   integer :: uetc_feedback = 1
   logical :: do_num = .true.
  !------------------------------
-  logical :: do_VOS3 = .true.
-  logical :: do_VOS4 = .false.
+  logical :: do_VOS3 = .false.
+  logical :: do_VOS4 = .true.
   integer :: no=64
   real(DP), allocatable :: vz(:),xi(:),alphaz(:),tphys(:),az(:),t(:)
   real(DP), allocatable :: vpr(:),xipr(:),alphapr(:),tphyspr(:),apr(:),tpr(:)
@@ -154,12 +153,12 @@ contains
     tol1 = 1.0d-6
     tol2 = 1.0d-4
 
-    open(unit = 50, file='output/data/alpha.dat',form='formatted')
-    open(unit = 51, file='output/data/v.dat', form='formatted')
-    open(unit = 52, file='output/data/xi.dat', form='formatted')
-    open(unit = 53, file='output/data/a.dat', form='formatted')
-    open(unit = 54, file='output/data/adot.dat', form='formatted')
-    open(unit = 55, file='output/data/time.dat', form='formatted')
+!    open(unit = 50, file='output/data/alpha.dat',form='formatted')
+!    open(unit = 51, file='output/data/v.dat', form='formatted')
+!    open(unit = 52, file='output/data/xi.dat', form='formatted')
+!    open(unit = 53, file='output/data/a.dat', form='formatted')
+!    open(unit = 54, file='output/data/adot.dat', form='formatted')
+!    open(unit = 55, file='output/data/time.dat', form='formatted')
 
 
     !Evolve the sting parameters and their derivatives
@@ -175,19 +174,19 @@ contains
         vz(i) = yev(3)
         !t as a function of tau
         tphys(i) = rombint(adtauda,0.0d0,yev(1),tol2)
-        write(50,*) alphaz(i)
-        write(51,*) vz(i)
-        write(52,*) xi(i)
-        write(53,*) az(i)
-        write(54,*) adot(i)
-        write(55,*) t(i)
+!        write(50,*) alphaz(i)
+!        write(51,*) vz(i)
+!        write(52,*) xi(i)
+!        write(53,*) az(i)
+!        write(54,*) adot(i)
+!        write(55,*) t(i)
     end do
-    close(unit = 50)
-    close(unit = 51)
-    close(unit = 52)
-    close(unit = 53)
-    close(unit = 54)
-    close(unit = 55)
+!    close(unit = 50)
+!    close(unit = 51)
+!    close(unit = 52)
+!    close(unit = 53)
+!    close(unit = 54)
+!    close(unit = 55)
 
     !Spline the one-scale functions of time and physical time
     call spline(tphys,t,no,d0lo,d0hi,tpr)
@@ -196,10 +195,90 @@ contains
     call spline(t,alphaz,no,d0lo,d0hi,alphapr)
     call spline(t,vz,no,d0lo,d0hi,vpr)
     call spline(t,az,no,d0lo,d0hi,apr)
-    write(*,*) "VOS Done"
+    write(*,*) "VOS3 Done"
   end subroutine
   !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   subroutine VOS4()
+    use ModelParams
+    implicit none
+    Type(StringParams) :: SPR
+    real(DP) :: xi0,v0,alpha0
+    real(DP) :: t0,a0,tau,tauend,tol1,tol2
+    real(DP) :: rombint,taui,tauf,dtau
+    integer, parameter :: l = 3
+    real(DP) :: yev(l),yevpr(l),c(24),w(l,9),adot(nint)
+    integer :: i,m
+    external fevolve4, rombint, dtauda, adtauda
+
+    call init_string(SPR)
+
+    if (uetc_feedback.gt.0) then
+       call write_string_params(SPR)
+    end if
+
+    xi0 = SPR%xi
+    v0 = SPR%v
+    alpha0 = SPR%alpha
+
+    allocate(vz(no),xi(no),tphys(no),az(no),t(no))
+    allocate(vpr(no),xipr(no),tphyspr(no),apr(no),tpr(no) )
+    
+    taui = 2.0d-2
+    tauf =  rombint(dtauda,0.0d0,10.0d0,1.0d-4)
+    dtau = log(tauf/taui)/dble(no-1)
+    do i = 1,no
+        t(i)=taui*exp(dble(i-1)*dtau)
+    end do
+    !Initial time from which the VOS is run
+    t0 = 0.1d0*t(1)
+    !Evolution parameter for the scale factor
+    yev(1) = adotrad*t0
+    !Evolution parameter for the correlation length
+    yev(2) = xi0*t0
+    !Evolution parameter for the velocity
+    yev(3) = v0
+    m = 1
+    tol1 = 1.0d-6
+    tol2 = 1.0d-4
+
+!    open(unit = 51, file='output/data/v4.dat', form='formatted')
+!    open(unit = 52, file='output/data/xi4.dat', form='formatted')
+!    open(unit = 53, file='output/data/a4.dat', form='formatted')
+!    open(unit = 54, file='output/data/adot4.dat', form='formatted')
+!    open(unit = 55, file='output/data/time4.dat', form='formatted')
+
+
+    !Evolve the sting parameters and their derivatives
+    do i = 1,no
+        tauend = t(i)
+        call dverk(SPR,l,fevolve4,t0,yev,tauend,tol1,m,c,l,w)                                                                           
+        call fevolve4(SPR,l,tauend,yev,yevpr)
+        !Derivative of the scale factor and string parameters
+        adot(i) =  yevpr(1)
+        az(i) =  yev(1)
+        xi(i) = yev(2)
+        vz(i) = yev(3)
+        !t as a function of tau
+        tphys(i) = rombint(adtauda,0.0d0,yev(1),tol2)
+!        write(51,*) vz(i)
+!        write(52,*) xi(i)
+!        write(53,*) az(i)
+!        write(54,*) adot(i)
+!        write(55,*) t(i)
+    end do
+!    close(unit = 51)
+!    close(unit = 52)
+!    close(unit = 53)
+!    close(unit = 54)
+!    close(unit = 55)
+
+    !Spline the one-scale functions of time and physical time
+    call spline(tphys,t,no,d0lo,d0hi,tpr)
+    call spline(t,tphys,no,d0lo,d0hi,tphyspr)
+    call spline(t,xi,no,d0lo,d0hi,xipr)
+    call spline(t,vz,no,d0lo,d0hi,vpr)
+    call spline(t,az,no,d0lo,d0hi,apr)
+    write(*,*) "VOS4 Done"
   end subroutine
   !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   subroutine get_SPR(tau,SPR)
@@ -207,13 +286,19 @@ contains
     real(DP), intent(in) :: tau
     Type(StringParams) :: SPR
     
-    if ((do_VOS3).or.(do_VOS4)) then
+    if (do_VOS3) then
              SPR%xi = splintxi(tau)
              SPR%alpha = splinta(tau)
              SPR%v = splintv(tau)
              SPR%mu = 1.0d0
              SPR%L = 0.95d0
-    else
+    elseif (do_VOS4) then
+             SPR%xi = splintxi(tau)
+             SPR%alpha = 1.9d0
+             SPR%v = splintv(tau)
+             SPR%mu = 1.0d0
+             SPR%L = 0.95
+     else
              SPR%mu = 1.0d0
              SPR%xi = 0.13d0
              SPR%alpha = 1.9d0

@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-plotact = False
+plotact = True
 
 gmu = 2E-7
 
-filename = ['data/test_init','data/test_VOS']
+filename = ['data/test_init','data/test_VOS','data/test_VOS4']
 linestyles = ['-',':','-.','--']
 colors = ['red','blue','green','black']
 
@@ -83,27 +83,28 @@ plt.ticklabel_format(style='sci',axis='y',scilimits=(0,0))
 plt.tight_layout()
 
 if plotact:
-	tt = np.loadtxt('data/cmbact/cl_tt.d')
-	stt = tt[:,1]*(gmu/1.1E-6)**2
-	vtt = tt[:,2]*(gmu/1.1E-6)**2
-	ttt = tt[:,3]*(gmu/1.1E-6)**2
-	ee = np.loadtxt('data/cmbact/cl_ee.d')
-	see = ee[:,1]*(gmu/1.1E-6)**2
-	vee = ee[:,2]*(gmu/1.1E-6)**2
-	tee = ee[:,3]*(gmu/1.1E-6)**2
-	bb = np.loadtxt('data/cmbact/cl_bb.d')
+	cmbact_fact = 1
+	tt = np.loadtxt('../cmbact4/cl_tt_100.d')
+	stt = tt[:,1]*(gmu/1.1E-6)**2*cmbact_fact
+	vtt = tt[:,2]*(gmu/1.1E-6)**2*cmbact_fact
+	ttt = tt[:,3]*(gmu/1.1E-6)**2*cmbact_fact
+	ee = np.loadtxt('../cmbact4/cl_ee_100.d')
+	see = ee[:,1]*(gmu/1.1E-6)**2*cmbact_fact
+	vee = ee[:,2]*(gmu/1.1E-6)**2*cmbact_fact
+	tee = ee[:,3]*(gmu/1.1E-6)**2*cmbact_fact
+	bb = np.loadtxt('../cmbact4/cl_bb_100.d')
 	sbb = np.zeros(len(bb[:,0]))
-	vbb = bb[:,1]*(gmu/1.1E-6)**2
-	tbb = bb[:,2]*(gmu/1.1E-6)**2
-	te = np.loadtxt('data/cmbact/cl_te.d')
-	ste = te[:,1]*(gmu/1.1E-6)**2
-	vte = te[:,2]*(gmu/1.1E-6)**2
-	tte = te[:,3]*(gmu/1.1E-6)**2
+	vbb = bb[:,1]*(gmu/1.1E-6)**2*cmbact_fact
+	tbb = bb[:,2]*(gmu/1.1E-6)**2*cmbact_fact
+	te = np.loadtxt('../cmbact4/cl_te_100.d')
+	ste = te[:,1]*(gmu/1.1E-6)**2*cmbact_fact
+	vte = te[:,2]*(gmu/1.1E-6)**2*cmbact_fact
+	tte = te[:,3]*(gmu/1.1E-6)**2*cmbact_fact
 	ls = [tt[:,0],ee[:,0],bb[:,0],te[:,0],tt[:,0],ee[:,0],bb[:,0],te[:,0],tt[:,0],ee[:,0],bb[:,0],te[:,0],tt[:,0],ee[:,0],bb[:,0],te[:,0]]
         stuff = [stt,see,sbb,ste,vtt,vee,vbb,vte,ttt,tee,tbb,tte]
 	for i in range(len(stuff)):
 		ax = fig.add_subplot(3,4,i+1)
-		ax.plot(ls[i],stuff[i])
+		ax.plot(ls[i],stuff[i],color='yellow')
 
 
 plt.savefig('plots/cls.pdf')

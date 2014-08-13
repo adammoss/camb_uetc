@@ -148,7 +148,7 @@
          ! AJM
          integer nmodes,uetc_n
          real(dl) uetc_kt_min,uetc_kt_max
-!         real(dl) xi_rad,alpha_rad,mu,v_rad,L,xi_mat,alpha_mat,v_mat
+         real(dl) xi,alpha,mu,v,L!,xi_mat,alpha_mat,v_mat
          real(dl) tau_eq,tau_s
 
          end type CAMBparams

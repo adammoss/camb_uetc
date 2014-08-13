@@ -13,7 +13,7 @@ ax2 = fig.add_subplot(233,sharey=ax1)
 ax3 = fig.add_subplot(234,sharex=ax)
 ax4 = fig.add_subplot(235,sharex=ax1,sharey=ax3)
 
-filename = 'data/test_VOS_uetc_'
+filename = 'data/test_VOS4_uetc_'
 
 ktau = np.loadtxt(filename+'ktau.dat')
 logktau = np.log(ktau)
