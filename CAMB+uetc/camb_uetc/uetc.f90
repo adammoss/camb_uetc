@@ -19,9 +19,9 @@ module uetc
   integer :: scaling_option = 2
   integer, parameter :: min_terms = 10
   real, parameter :: scale_terms = 3.0
-  real(DP), parameter :: xmin = 0.05d0
+  real(DP), parameter :: xmin = 0.15d0
   real(DP), parameter :: xmax = 20.0d0
-  real(DP), parameter :: xapr = 2.0d0
+  real(DP), parameter :: xapr = 2.5d0
   real(DP), parameter :: etcmin = 0.001d0
   real(DP) :: weighting = 0.0d0
   real(DP) :: ktau_min,ktau_max,dktau,dx_grid
@@ -50,6 +50,7 @@ module uetc
   real(DP), allocatable :: x_array_grid(:),log_x_array_grid(:)  
   real, allocatable :: I1_grid(:,:,:),I4_grid(:,:,:)
   character(len=100) :: grid_root='/home/adammoss/work/code/string/grid/'
+  Type(StringParams) :: SPRa
   logical :: output_uetc = .false.
   integer :: nmodes
   logical :: do_diagonalize = .false.
@@ -59,8 +60,8 @@ module uetc
   logical :: do_num = .true.
  !------------------------------
   logical :: do_VOS3 = .false.
-  logical :: do_VOS4 = .true.
-  integer :: no=64
+  logical :: do_VOS4 = .false.
+  integer :: no=300
   real(DP), allocatable :: vz(:),xi(:),alphaz(:),tphys(:),az(:),t(:)
   real(DP), allocatable :: vpr(:),xipr(:),alphapr(:),tphyspr(:),apr(:),tpr(:)
 contains
@@ -68,26 +69,20 @@ contains
   subroutine init_string(SPR)
     implicit none
     Type(StringParams) :: SPR
-   !Quantities from the string.f90 code
-    SPR%cr=0.23d0
-    SPR%cm=0.18d0
-    SPR%g=300.0d0
-    SPR%fkr=0.17d0
-    SPR%fkm=0.49d0
     ! Initialize string model parameters	
     ! the string tension (the most important parameter)
     !SPR%mu=1.1d-6 
-    SPR%mu = 1.0d0
+    SPR%mu = SPRa%mu
     ! Wiggliness                   
-    SPR%alpha=1.9d0
+    SPR%alpha=SPRa%alpha
     ! v is the initial rms string velocity (over all scales)
-    SPR%v=dsqrt(SPR%fkr/(SPR%cr+SPR%fkr))
+    SPR%v=SPRa%v
     !SPR%v=0.65d0
     ! dksi is the initial correlation length/initial conformal time
-    SPR%xi=SPR%fkr/(2.0d0*SPR%v)
+    SPR%xi=SPRa%xi
     !SPR%xi=0.13d0    
     ! xlf 
-    SPR%L = 0.95d0
+    SPR%L = SPRa%L
   end subroutine init_string
   !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   subroutine write_string_params(SPR)
@@ -127,11 +122,11 @@ contains
     if (uetc_feedback.gt.0) then
        call write_string_params(SPR)
     end if
-
-    xi0 = SPR%xi
-    v0 = SPR%v
-    alpha0 = SPR%alpha
-
+   
+    xi0 = SPRa%xi
+    v0 = SPRa%v
+    alpha0 = SPRa%alpha
+    
     allocate(vz(no),xi(no),alphaz(no),tphys(no),az(no),t(no))
     allocate(vpr(no),xipr(no),alphapr(no),tphyspr(no),apr(no),tpr(no) )
     
@@ -163,17 +158,21 @@ contains
 
     !Evolve the sting parameters and their derivatives
     do i = 1,no
+!    write(*,*) i
         tauend = t(i)
         call dverk(SPR,l,fevolve,t0,yev,tauend,tol1,m,c,l,w)                                                                           
         call fevolve(SPR,l,tauend,yev,yevpr)
         !Derivative of the scale factor and string parameters
         adot(i) =  yevpr(1)
         az(i) =  yev(1)
-        xi(i) = yev(2)!/t(i)
+        xi(i) = yev(2)
         alphaz(i) = 1.0d0+(alpha0-1.0d0)/(yevpr(1)*t0/yev(1))
         vz(i) = yev(3)
         !t as a function of tau
+!        write(*,*) "Rombint Started"
         tphys(i) = rombint(adtauda,0.0d0,yev(1),tol2)
+!        write(*,*) "Rombint Finished"
+
 !        write(50,*) alphaz(i)
 !        write(51,*) vz(i)
 !        write(52,*) xi(i)
@@ -206,7 +205,7 @@ contains
     real(DP) :: t0,a0,tau,tauend,tol1,tol2
     real(DP) :: rombint,taui,tauf,dtau
     integer, parameter :: l = 3
-    real(DP) :: yev(l),yevpr(l),c(24),w(l,9),adot(nint)
+    real(DP) :: yev(l),yevpr(l),c(24),w(l,9)
     integer :: i,m
     external fevolve4, rombint, dtauda, adtauda
 
@@ -216,9 +215,9 @@ contains
        call write_string_params(SPR)
     end if
 
-    xi0 = SPR%xi
-    v0 = SPR%v
-    alpha0 = SPR%alpha
+    xi0 = SPRa%xi
+    v0 = SPRa%v
+    alpha0 = SPRa%alpha
 
     allocate(vz(no),xi(no),tphys(no),az(no),t(no))
     allocate(vpr(no),xipr(no),tphyspr(no),apr(no),tpr(no) )
@@ -241,12 +240,11 @@ contains
     tol1 = 1.0d-6
     tol2 = 1.0d-4
 
-!    open(unit = 51, file='output/data/v4.dat', form='formatted')
-!    open(unit = 52, file='output/data/xi4.dat', form='formatted')
-!    open(unit = 53, file='output/data/a4.dat', form='formatted')
-!    open(unit = 54, file='output/data/adot4.dat', form='formatted')
-!    open(unit = 55, file='output/data/time4.dat', form='formatted')
-
+    open(unit = 51, file='output/data/comp/v4.dat', form='formatted')
+    open(unit = 52, file='output/data/comp/xi4.dat', form='formatted')
+    open(unit = 53, file='output/data/comp/a4.dat', form='formatted')
+    open(unit = 55, file='output/data/comp/time4.dat', form='formatted')
+    open(unit = 56, file='output/data/comp/tphys.dat', form='formatted')
 
     !Evolve the sting parameters and their derivatives
     do i = 1,no
@@ -254,23 +252,23 @@ contains
         call dverk(SPR,l,fevolve4,t0,yev,tauend,tol1,m,c,l,w)                                                                           
         call fevolve4(SPR,l,tauend,yev,yevpr)
         !Derivative of the scale factor and string parameters
-        adot(i) =  yevpr(1)
+!        adot(i) =  yevpr(1)
         az(i) =  yev(1)
         xi(i) = yev(2)
         vz(i) = yev(3)
         !t as a function of tau
         tphys(i) = rombint(adtauda,0.0d0,yev(1),tol2)
-!        write(51,*) vz(i)
-!        write(52,*) xi(i)
-!        write(53,*) az(i)
-!        write(54,*) adot(i)
-!        write(55,*) t(i)
+        write(51,*) vz(i)
+        write(52,*) xi(i)
+        write(53,*) az(i)
+        write(55,*) t(i)
+        write(56,*) tphys(i)
     end do
-!    close(unit = 51)
-!    close(unit = 52)
-!    close(unit = 53)
-!    close(unit = 54)
-!    close(unit = 55)
+    close(unit = 51)
+    close(unit = 52)
+    close(unit = 53)
+    close(unit = 55)
+    close(unit = 56)
 
     !Spline the one-scale functions of time and physical time
     call spline(tphys,t,no,d0lo,d0hi,tpr)
@@ -290,20 +288,20 @@ contains
              SPR%xi = splintxi(tau)
              SPR%alpha = splinta(tau)
              SPR%v = splintv(tau)
-             SPR%mu = 1.0d0
-             SPR%L = 0.95d0
+             SPR%mu = SPRa%mu
+             SPR%L = SPRa%L
     elseif (do_VOS4) then
              SPR%xi = splintxi(tau)
-             SPR%alpha = 1.9d0
+             SPR%alpha = SPRa%alpha
              SPR%v = splintv(tau)
-             SPR%mu = 1.0d0
-             SPR%L = 0.95
+             SPR%mu = SPRa%mu
+             SPR%L = SPRa%L
      else
-             SPR%mu = 1.0d0
-             SPR%xi = 0.13d0
-             SPR%alpha = 1.9d0
-             SPR%v = 0.65d0
-             SPR%L = 0.95d0
+             SPR%mu = SPRa%mu
+             SPR%xi = splintxi(tau)!SPRa%xi
+             SPR%alpha = SPRa%alpha
+             SPR%v = splintv(tau)!SPRa%v
+             SPR%L = SPRa%L
     end if
 
   end subroutine get_SPR
@@ -327,7 +325,7 @@ contains
     integer i,j,k,ii,status,n
     real(DP) :: evec,devec,sevec(2),dsevec(2),uetc_arr(5)
     real(DP) :: tau1test,tau2test,x1test,x2test,rhotest,I1_val,I4_val
-    Type(StringParams) :: SPR
+    Type(StringParams) :: SPR,SPRtest
 
     if ((do_VOS3).or.(do_VOS4)) then
        nint = nk
@@ -365,10 +363,9 @@ contains
     allocate(wtau(n,n))
 
     dktau = log(ktau_max/ktau_min)/dble(n-1)
-    do i=1,n	    
+    do i=1,n   
        ktau_array(i)=ktau_min*exp(dktau*(i-1))
        log_ktau_array(i)=log(ktau_array(i))
-       !write(*,*) i,ktau_array(i)
     end do
 
     if (do_VOS3) then
@@ -376,8 +373,14 @@ contains
        do_VOS4 = .false.
     elseif (do_VOS4) then
        call VOS4()
+       open(unit = 51, file='output/data/comp/k', form='formatted')
+       do i=1,nint
+          write(51,*) k_arr(i)
+       end do
+       close(unit = 51) 
     else
        no_evolve=.true.
+       call VOS4()
     end if
 
     if (do_init_grid .and. use_grid) then
@@ -386,26 +389,22 @@ contains
        else
           call read_grid()
        end if
-       ! Testing 
-       !x1test = 100.0d0
-       !x2test = 20.0d0
-       !rhotest = 10.0d0
-       !call get_grid(x1test,x2test,rhotest,I1_val,I4_val,status)
-       !write(*,*) I1_int_num(x1test,x2test,rhotest)
-       !write(*,*) I1_val
-       !write(*,*) I4_int_num(x1test,x2test,rhotest)
-       !write(*,*) I4_val
-       ! End testing  
     end if
+   
+    open(unit=50, file='output/data/comp/tauval.dat', form='formatted')
+    open(unit=51, file='output/data/comp/xival.dat', form='formatted')
+    open(unit=52,file='output/data/comp/vval.dat', form='formatted')
+    do i=1,n
+        tau1 = ktau_array(i)/k_arr(17)
+        call get_SPR(tau1,SPRtest)
+        write(50,*) tau1
+        write(51,*) SPRtest%xi
+        write(52,*) SPRtest%v
+    end do
+    close(unit = 50)
+    close(unit = 51)
+    close(unit = 52)
 
-    if(.false.) then
-       ! Testing
-       tau1test = 50.0d0
-       tau2test = 40.0d0
-       call get_uetc(tau1test,tau2test,1.0d0,uetc_arr)
-       write(*,*) uetc_arr(:)
-       stop
-    end if
     do ii=1,nint 
        if (uetc_feedback.gt.0) write(*,*) 'K mode:',ii
        do i=1,n
@@ -414,9 +413,9 @@ contains
           do j=1,n 
              if (j.gt.i) cycle
              if(no_evolve) then
-                tau1 = ktau_array(i)
-                tau2 = ktau_array(j)
-                call get_uetc(tau1,tau2,1.0d0,uetc_arr)
+                tau1 = ktau_array(i)/k_arr(8)
+                tau2 = ktau_array(j)/k_arr(8)
+                call get_uetc(tau1,tau2,k_arr(8),uetc_arr)
              else
                 tau1 = ktau_array(i)/k_arr(ii)
                 tau2 = ktau_array(j)/k_arr(ii)
@@ -425,7 +424,7 @@ contains
              wtau(i,j) = (ktau_array(i)*ktau_array(j))**weighting
              ss00array(i,j) = sqrt(tau1*tau2)*uetc_arr(1)
              ssarray(i,j) = sqrt(tau1*tau2)*uetc_arr(2)
-             vvarray(i,j) = sqrt(tau1*tau2)*uetc_arr(3)		  
+             vvarray(i,j) = sqrt(tau1*tau2)*uetc_arr(3)
              ttarray(i,j) = sqrt(tau1*tau2)*uetc_arr(4)
              sscrossarray(i,j) = sqrt(tau1*tau2)*uetc_arr(5)
           end do
@@ -441,19 +440,19 @@ contains
              if (j.gt.i) wtau(i,j)=wtau(j,i)
           end do
        end do
-       if(output_uetc .and. ii.eq.1) then 
+       if(output_uetc) then 
           open(unit=50,file =trim(uetc_file)//'_ktau.dat')
-          do i=1,n	    
+          do i=1,n    
              write(50,'(1E15.5)') ktau_array(i)
           end do
           close(50)
-          open(unit=50,file = trim(uetc_file)//'_ss00.dat')
-          open(unit=51,file = trim(uetc_file)//'_ss.dat')	
-          open(unit=52,file = trim(uetc_file)//'_vv.dat')
-          open(unit=53,file = trim(uetc_file)//'_tt.dat')
-          open(unit=54,file = trim(uetc_file)//'_sscross.dat')
+          open(unit=50,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_ss00.dat')
+          open(unit=51,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_ss.dat')
+          open(unit=52,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_vv.dat')
+          open(unit=53,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_tt.dat')
+          open(unit=54,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_sscross.dat')
           do i=1,n
-             write(50,'(500E15.5)') ss00array(i,:)
+             write(50,'(5000E15.5)') ss00array(i,:)
              write(51,'(5000E15.5)') ssarray(i,:)
              write(52,'(5000E15.5)') vvarray(i,:)
              write(53,'(5000E15.5)') ttarray(i,:)
@@ -475,7 +474,6 @@ contains
              scalar_evec_temp(j+n,i)=wtau(i,j)*scalar_evec_temp(i,j+n)         
              ss00_evec_temp(i,j) = wtau(i,j)*ss00array(i,j)
              ss_evec_temp(i,j) = wtau(i,j)*ssarray(i,j)
-             !!write(*,*) ss00_evec_temp(i,j),ss_evec_temp(i,j),vv_evec_temp(i,j),tt_evec_temp(i,j),wtau(i,j)
           end do
        end do
        !write(*,*) 'Diagonalizing UETC'
@@ -496,8 +494,36 @@ contains
           tt_evec(ii,i,:) = tt_evec_temp(:,n-i+1)
           call spline_nr(log(ktau_array),tt_evec(ii,i,:),d0lo,d0hi,tt_evec_pr(ii,i,:))
        end do
-
-       if(output_uetc.and. ii.eq.1) then
+        
+       if(output_uetc .and. ii.eq.500) then 
+          open(unit=50,file = trim(uetc_file)//'_ss00_eval.dat')
+          open(unit=51,file = trim(uetc_file)//'_ss00_evec.dat')	
+          open(unit=52,file = trim(uetc_file)//'_ss_eval.dat')
+          open(unit=53,file = trim(uetc_file)//'_ss_evec.dat')
+          open(unit=54,file = trim(uetc_file)//'_vv_eval.dat')
+          open(unit=55,file = trim(uetc_file)//'_vv_evec.dat')
+          open(unit=56,file = trim(uetc_file)//'_tt_eval.dat')
+          open(unit=57,file = trim(uetc_file)//'_tt_evec.dat')
+          do i=1,n
+             write(50,'(5000E15.5)') ss00_eval(ii,i)
+             write(51,'(5000E15.5)') ss00_evec(ii,i,:)
+             write(52,'(5000E15.5)') ss_eval(ii,i)
+             write(53,'(5000E15.5)') ss_evec(ii,i,:)
+             write(54,'(5000E15.5)') vv_eval(ii,i)
+             write(55,'(5000E15.5)') vv_evec(ii,i,:)
+             write(56,'(5000E15.5)') tt_eval(ii,i)
+             write(57,'(5000E15.5)') tt_evec(ii,i,:)
+          end do
+          close(50)
+          close(51)
+          close(52)
+          close(53)
+          close(54)
+          close(55)
+          close(56)
+          close(57)
+       end if
+       if(output_uetc.and. ii.eq.500) then
           ! Test reconstructing UETC from a number of eigenmodes
           ss00array_recon(:,:) = 0.0d0
           ssarray_recon(:,:) = 0.0d0
@@ -662,7 +688,6 @@ contains
     do i=1,nx_grid
        x_array_grid(i)=x_min_grid*exp(dx_grid*(i-1))
        log_x_array_grid(i)=log(x_array_grid(i))
-       !write(*,*) i,x_array_grid(i),log_x_array_grid(i)
     end do
     nelements=naxes(1)**3
     group=1
@@ -708,21 +733,18 @@ contains
 
     nrho_1 = floor((log_rho-log_x_array_grid(1))/dx_grid+1)
     if (nrho_1.eq.0) then 
-       !write(*,*) 'Warning, nrho_1=0 for rho:',rho
        status = 1
        return
     end if
     nrho_2 = nrho_1 + 1
     nx1_1 = floor((log_x1-log_x_array_grid(1))/dx_grid+1)
     if (nx1_1.eq.0) then 
-       !write(*,*) 'Warning, nx1_1=0 for x1:',x1
        status = 1
        return
     end if
     nx1_2 = nx1_1 + 1
     nx2_1 = floor((log_x2-log_x_array_grid(1))/dx_grid+1)
     if (nx2_1.eq.0) then 
-       !write(*,*) 'Warning, nx2_1=0 for x2:',x2
        status = 1
        return
     end if
@@ -878,19 +900,14 @@ contains
        if (uetc_feedback.gt.1) write(*,*) 'Using small x'
        uetc_val(1) = -(alpha1*alpha2*mu1*mu2*(-6.0d0 + rho**2.0d0)*x1*x2)/&
                      (6.0d0*k**2.0d0*dsqrt((-1.0d0+ v1**2.0d0)*(-1.0d0 + v2**2.0d0)))
-                     !mu**2.0d0*x1*x2*alpha**2/(k**2.0d0*(1.0d0-v**2.0d0))
        uetc_val(2) = (mu1*mu2*(rho**2.0d0*(-10.0d0 + (10.0d0 - 11.0d0*alpha2**2.0d0)*v2**2.0d0 + &
                       v1**2.0d0*(10.0d0 - 11.0d0*alpha1**2.0d0 + (-10.0d0 + 11.0d0*alpha1**2.0d0 + &
                       11.0d0*(1.0d0 - 2.0d0*alpha1**2.0d0)*alpha2**2.0d0)*v2**2.0d0)) + 42.0d0*(2.0d0 + &
                       (-2.0d0 + alpha2**2.0d0)*v2**2.0d0 + v1**2.0d0*(-2.0d0 + alpha1**2.0d0 + (2.0d0 - &
                       alpha1**2.0d0 + (-1.0d0 + 2.0d0*alpha1**2.0d0)*alpha2**2.0d0)*v2**2.0d0)))*x1*x2)/&
                       (420.0d0*alpha1*alpha2*k**2.0d0*dsqrt((-1.0d0 + v1**2.0d0)*(-1.0d0 + v2**2.0d0)))
-                     !mu**2.0d0*x1*x2*(1.0d0+v**2*(alpha**2-2.0d0)+v**4*(1.0d0-alpha**2+alpha**4))/&
-                     !(5.0d0*k**2.0d0*(1.0d0-v**2.0d0)*alpha**2)
        uetc_val(3) = (mu1*mu2*2.3*(8 + 4*(-2 + alpha1**2)*v1**2 + (-8 - 4*(-2 + alpha1**2)*v1**2 + &
                      alpha2**2*(4 + (-4 + 7*alpha1**2)*v1**2))*v2**2)*x1*x2)/(256.*alpha1*alpha2*k**2*dsqrt(1 - v1**2)*dsqrt(1 - v2**2)) 
-                     !mu**2*x1*x2*(1.0d0+v**2*(alpha**2-2.0d0)+v**4*(1.0d0-alpha**2+alpha**4))/&
-                     !(15.0d0*k**2*(1.0d0-v**2)*alpha**2)
        uetc_val(4) = -(mu1*mu2*(-28.0d0 + 6.0d0*rho**2.0d0 + 28.0d0*v1**2.0d0 - 14.0d0*alpha1**2.0d0*v1**&
                      2.0d0 - 6.0d0*rho**2.0d0*v1**2.0d0 + alpha1**2.0d0*rho**2.0d0*v1**2.0d0 + &
                      28.0d0*v2**2.0d0 - 14.0d0*alpha2**2.0d0*v2**2.0d0 - 6.0d0*rho**2.0d0*v2**2.0d0 + &
@@ -901,20 +918,11 @@ contains
                      v1**2.0d0*v2**2.0d0 + 2.0d0*alpha1**2.0d0*alpha2**2.0d0*rho**2.0d0*v1**2.0d0*v2**&
                      2.0d0)*x1*x2)/(420.0d0*alpha1*alpha2*k**2.0d0*dsqrt((-1.0d0 + v1**2.0d0)*&
                      (-1.0d0 + v2**2.0d0)))
-                     !mu**2*x1*x2*(1.0d0+v**2*(alpha**2-2.0d0)+v**4*(1.0d0-alpha**2+alpha**4))/&
-                     !(15.0d0*k**2*(1.0d0-v**2)*alpha**2)
        uetc_val(5) = -(mu1*mu2*rho**2.0d0*(alpha1**2*(1.0d0 + (-1.0d0 + 2.0d0*alpha2**2.0d0)*v2**2.0d0)+ &
                      alpha2**2*(1.0d0 + (-1.0d0 + 2.0d0*alpha1**2.0d0)*v1**2.0d0))*&
                      x1*x2)/(60.0d0*alpha1*alpha2*k**2.0d0*dsqrt((-1.0d0 + v1**2.0d0)*(-1.0d0 + v2**2.0d0)))
-                     !mu**2.0d0*x1*x2*((x1**2+x2**2)*(2.0d0+v**2*(alpha**2-2.0d0))-12.0d0*rho**2*(1.0d0+&
-                     !v**2*(2.0d0*alpha**2-1.0d0)))/(360*k**2.0d0*(1.0d0-v**2.0d0))
        uetc_val(1:5) = scaling_factor(tau1,tau2,xi1,xi2,L)*uetc_val(1:5)
 
-       if ((isNan(uetc_val(1))).or.(isNan(uetc_val(2))).or.(isNan(uetc_val(3))).or.(isNan(uetc_val(4))).or.(isNan(uetc_val(5)))) then
-               write(*,*) v1,v2
-!               write(*,*) 'Holy Shit!',uetc_val(1),uetc_val(2),uetc_val(3),uetc_val(4),uetc_val(5),alpha1,alpha2,v1,v2,rho,x1,x2
-       end if
-        
        return
     end if
 
@@ -947,128 +955,122 @@ contains
        return
     end if
 
-    if (abs(x1-x2).ge.xapr) then
-       !Use Ed's approximation
-       if (uetc_feedback.gt.1) write(*,*) 'Using Eds Approximation'
-       I1 = I1_int_a(min(x1,x2),rho)
-       I4 = I4_int_a(min(x1,x2),rho)
-
-    else
-
-    nterms = max(min_terms,int(scale_terms*xp))
-    if(uetc_feedback.gt.1) write(*,*) 'N terms:',nterms
-
-    ! Combined integral
-    if(use_grid) then
-       call get_grid(x1,x2,rho,I1,I4,status)
-       if (status.eq.1) then
-          I1 = I1_int_num(x1,x2,rho)
-          I4 = I4_int_num(x1,x2,rho)
-       end if
-    else
-       
-       if (do_num.or.(x1.gt.xmax).or.(x2.gt.xmax)) then 
-          if (uetc_feedback.gt.1) write(*,*) 'Exceeds xmax, integrating I1 and I4'
-          I1 = I1_int_num(x1,x2,rho)
-          I4 = I4_int_num(x1,x2,rho)
+    if (rho.lt.1E-2) then
+       if (abs(x1-x2).ge.xapr) then
+         !Use Ed's approximation
+         if (uetc_feedback.gt.1) write(*,*) 'Using Eds Approximation'
+         I1 = I1_int_a(min(x1,x2),rho)
        else
-          I1 = I1_int(xm,rho,nterms)-I1_int(xp,rho,nterms)
-          I4 = I4_int(xm,rho,nterms)-I4_int(xp,rho,nterms)
-       end if
+         nterms = max(min_terms,int(scale_terms*xp))
+         if(uetc_feedback.gt.1) write(*,*) 'N terms:',nterms
+           ! Combined integral
+           if (do_num.or.(x1.gt.xmax).or.(x2.gt.xmax)) then 
+              if (uetc_feedback.gt.1) write(*,*) 'Exceeds xmax, integrating I1 and I4'
+              I1 = I1_int_num(x1,x2,rho)
+           else
+              I1 = I1_int(xm,rho,nterms)-I1_int(xp,rho,nterms)
+           end if
+         end if
+         I2 = I2_int(xm,rho)-I2_int(xp,rho)
+         I3 = I3_int(xm,rho)-I3_int(xp,rho)
+         I4 = I1/2.0d0
+         I5 = I2/2.0d0
+         I6 = I3/2.0d0
+    else
+       if (abs(x1-x2).ge.xapr) then
+         !Use Ed's approximation
+         if (uetc_feedback.gt.1) write(*,*) 'Using Eds Approximation'
+         I1 = I1_int_a(min(x1,x2),rho)
+         I4 = I4_int_a(min(x1,x2),rho)
+       else
+         nterms = max(min_terms,int(scale_terms*xp))
+         if(uetc_feedback.gt.1) write(*,*) 'N terms:',nterms
+           ! Combined integral
+           if(use_grid) then
+             call get_grid(x1,x2,rho,I1,I4,status)
+             if (status.eq.1) then
+               I1 = I1_int_num(x1,x2,rho)
+               I4 = I4_int_num(x1,x2,rho)
+             end if
+           else
+             if (do_num.or.(x1.gt.xmax).or.(x2.gt.xmax)) then 
+             if (uetc_feedback.gt.1) write(*,*) 'Exceeds xmax, integrating I1 and I4'
+               I1 = I1_int_num(x1,x2,rho)
+               I4 = I4_int_num(x1,x2,rho)
+             else
+               I1 = I1_int(xm,rho,nterms)-I1_int(xp,rho,nterms)
+               I4 = I4_int(xm,rho,nterms)-I4_int(xp,rho,nterms)
+             end if
+           end if
+         end if
+       I2 = I2_int(xm,rho)-I2_int(xp,rho)
+       I3 = I3_int(xm,rho)-I3_int(xp,rho)
+       I5 = I5_int(xm,rho)-I5_int(xp,rho)
+       I6 = I6_int(xm,rho)-I6_int(xp,rho)
+       if (uetc_feedback.gt.1) then
+         write(*,*) 'Components:'
+         write(*,'(2E15.5)') I1
+         write(*,'(2E15.5)') I2
+         write(*,'(2E15.5)') I3
+         write(*,'(2E15.5)') I4
+         write(*,'(2E15.5)') I5
+         write(*,'(2E15.5)') I6
+       endif
     end if
-    end if
-    I2 = I2_int(xm,rho)-I2_int(xp,rho)
-    I3 = I3_int(xm,rho)-I3_int(xp,rho)
-    I5 = I5_int(xm,rho)-I5_int(xp,rho)
-    I6 = I6_int(xm,rho)-I6_int(xp,rho)
-
-    if (uetc_feedback.gt.1) then
-       write(*,*) 'Components:'
-       write(*,'(2E15.5)') I1
-       write(*,'(2E15.5)') I2
-       write(*,'(2E15.5)') I3
-       write(*,'(2E15.5)') I4
-       write(*,'(2E15.5)') I5
-       write(*,'(2E15.5)') I6
-    endif
 
     !00
     a1 = 2*alpha1*alpha2
-         !2.0d0*alpha**2
     sum = a1*I1
     uetc_val(1) = sum*mu1*mu2*scaling_factor(tau1,tau2,xi1,xi2,L)/(k**2*dsqrt(1.0d0-v1**2)*dsqrt(1.0d0-v2**2))
     
     !SCALAR
     a1 = (-27*alpha1**2*alpha2**2*v1**2*v2**2 + rho**2*(1 + (-1 + 2*alpha1**2)*v1**2)*(1 + (-1 + 2*alpha2**2)*v2**2))/&
          (2.*alpha1*alpha2*rho**2) 
-         !(-27*alpha**4*v**4 + rho**2*(1 + (-1 + 2*alpha**2)*v**2)**2)/(2.*alpha**2*rho**2)
     a2 = (-3*(-9*alpha1**2*alpha2**2*v1**2*v2**2 + rho**2*(-1 + v2**2 + v1**2*(1 + (-1 + alpha1**2*alpha2**2)*v2**2))))/(2.*alpha1*alpha2*rho**2)
-         !(3*(9*alpha**4*v**4 + rho**2*(1 - 2*v**2 - (-1 + alpha**4)*v**4)))/(2.*alpha**2*rho**2)
     a3 = (-9*(1 + (-1 + alpha1**2)*v1**2)*(1 + (-1 + alpha2**2)*v2**2))/(2.*alpha1*alpha2) 
-         !(-9*(1 + (-1 + alpha**2)*v**2)**2)/(2.*alpha**2)
     a4 = (-3*(-(alpha2**2*rho**2*(-1 + v1**2)*v2**2) + alpha1**2*v1**2*(-18*alpha2**2*v2**2 + rho**2*(1 + (-1 + 4*alpha2**2)*v2**2))))/&
          (2.*alpha1*alpha2*rho**2)
-         !3*v**2*(-1 + (1 + alpha**2*(-2 + 9/rho**2))*v**2)
     a5 = (3*(-(alpha2**2*rho**2*(-1 + v1**2)*v2**2) + alpha1**2*v1**2*(-18*alpha2**2*v2**2 + rho**2*(1 + (-1 + 4*alpha2**2)*v2**2))))/&
          (2.*alpha1*alpha2*rho**2) 
-         !3*v**2 + (-3 + alpha**2*(6 - 27/rho**2))*v**4
     a6 = (9*(-(alpha2**2*(-1 + v1**2)*v2**2) + alpha1**2*v1**2*(1 + (-1 + 2*alpha2**2)*v2**2)))/(2.*alpha1*alpha2) 
-         !9*(v**2 + (-1 + alpha**2)*v**4)
     sum = a1*I1 + a2*I2 + a3*I3 + a4*I4 + a5*I5 + a6*I6
     uetc_val(2) = sum*mu1*mu2*scaling_factor(tau1,tau2,xi1,xi2,L)/(k**2*dsqrt(1.0d0-v1**2)*dsqrt(1.0d0-v2**2))
 
     !VECTOR
-    !C = 1.0d0+v**2*(alpha**2-1.0d0)
     a1 = (3*alpha1*alpha2*v1**2*v2**2)/rho**2
-         !3.0d0*v**4*alpha**2/rho**2
     a2 = (-3*alpha1*alpha2*v1**2*v2**2)/rho**2
-         !-3.0d0*v**4*alpha**2/rho**2
     a3 = ((1 + (-1 + alpha1**2)*v1**2)*(1 + (-1 + alpha2**2)*v2**2))/(alpha1*alpha2)
-         !C**2/alpha**2
     a4 = (alpha1*alpha2*(-6 + rho**2)*v1**2*v2**2)/rho**2
-         !-v**4*alpha**2*(6.0d0/rho**2-1.0d0)
     a5 = -((alpha1*alpha2*(-6 + rho**2)*v1**2*v2**2)/rho**2) 
-         !v**4*alpha**2*(6.0d0/rho**2-1.0d0)
     a6 = (alpha2**2*(-1 + v1**2)*v2**2 - alpha1**2*v1**2*(1 + (-1 + 2*alpha2**2)*v2**2))/(alpha1*alpha2)
-         !-2.0d0*v**2*C
     sum = a1*I1 + a2*I2 + a3*I3 + a4*I4 + a5*I5 + a6*I6
     uetc_val(3) = sum*mu1*mu2*scaling_factor(tau1,tau2,xi1,xi2,L)/(k**2*dsqrt(1.0d0-v1**2)*dsqrt(1.0d0-v2**2))
 
     !TENSOR
     a1 = (-3.0d0*alpha1**2.0d0*alpha2**2.0d0*v1**2.0d0*v2**2.0d0 + rho**2.0d0*(-1.0d0 + v1**2.0d0)*&
          (-1.0d0 + v2**2.0d0))/(4.0d0*alpha1*alpha2*rho**2.0d0)
-         !(-3*alpha**4*v**4 + rho**2*(-1 + v**2)**2)/(4.*alpha**2*rho**2)
     a2 = (3.0d0*alpha1**2.0d0*alpha2**2.0d0*v1**2.0d0*v2**2.0d0 + rho**2.0d0*(-1.0d0 + v2**2.0d0 + &
          v1**2.0d0*(1.0d0 + (-1.0d0 + alpha1**2.0d0*alpha2**2.0d0)*v2**2.0d0)))/&
          (4.0d0*alpha1*alpha2*rho**2.0d0)
-         !(3*alpha**4*v**4 + rho**2*(-1 + 2*v**2 + (-1 + alpha**4)*v**4))/(4.*alpha**2*rho**2)
     a3 = -((1.0d0 + (-1.0d0 + alpha1**2.0d0)*v1**2.0d0)*(1.0d0 + (-1.0d0 + alpha2**2.0d0)*v2**2.0d0))/&
          (4.0d0*alpha1*alpha2)
-         !-(1 + (-1 + alpha**2)*v**2)**2/(4.*alpha**2)
     a4 = (-(alpha2**2.0d0*rho**2.0d0*(-1.0d0 + v1**2.0d0)*v2**2.0d0) + alpha1**2.0d0*v1**2.0d0*&
          (6.0d0*alpha2**2.0d0*v2**2.0d0 - rho**2.0d0*(-1.0d0 + v2**2.0d0)))/&
          (4.0d0*alpha1*alpha2*rho**2.0d0)
-         !(v**2*(1 + (-1 + (3*alpha**2)/rho**2)*v**2))/2.
     a5 = (alpha2**2.0d0*rho**2.0d0*(-1.0d0 + v1**2.0d0)*v2**2.0d0 + alpha1**2.0d0*v1**2.0d0*&
          (-6.0d0*alpha2**2.0d0*v2**2.0d0 + rho**2.0d0*(-1.0d0 + v2**2.0d0)))/&
          (4.0d0*alpha1*alpha2*rho**2.0d0)
-         !(-3*alpha**2*v**4 + rho**2*v**2*(-1 + v**2))/(2.*rho**2)
     a6 = (-(alpha2**2.0d0*(-1.0d0 + v1**2.0d0)*v2**2.0d0) + alpha1**2.0d0*v1**2.0d0*(1.0d0 + &
          (-1.0d0 + 2.0d0*alpha2**2.0d0)*v2**2.0d0))/(4.0d0*alpha1*alpha2)
-         !(v**2 + (-1 + alpha**2)*v**4)/2.
     sum = a1*I1 + a2*I2 + a3*I3 + a4*I4 + a5*I5 + a6*I6
     uetc_val(4) = sum*mu1*mu2*scaling_factor(tau1,tau2,xi1,xi2,L)/(k**2*dsqrt(1.0d0-v1**2)*dsqrt(1.0d0-v2**2))
 
     !00-SCALAR
     a1 = (-(alpha2**2*(-1 + v1**2)) + alpha1**2*(1 - v2**2 + 2*alpha2**2*(v1**2 + v2**2)))/(2.*alpha1*alpha2)
-         !1.0d0 + (-1.0d0 + 2*alpha**2)*v**2
     a2 = (-3*(-(alpha2**2*(-1 + v1**2)) + alpha1**2*(1 - v2**2 + alpha2**2*(v1**2 + v2**2))))/(2.*alpha1*alpha2)
-         !-3.0d0 - 3.0d0*(-1.0d0 + alpha**2)*v**2
     a3 = 0.0d0
     a4 = (-3*alpha1*alpha2*(v1**2 + v2**2))/2
-         !-3*alpha**2*v**2
     a5 = (3*alpha1*alpha2*(v1**2 + v2**2))/2
-         !3*alpha**2*v**2
     a6 = 0.0d0
     sum = a1*I1 + a2*I2 + a3*I3 + a4*I4 + a5*I5 + a6*I6
     uetc_val(5) = sum*mu1*mu2*scaling_factor(tau1,tau2,xi1,xi2,L)/(k**2*dsqrt(1.0d0-v1**2)*dsqrt(1.0d0-v2**2))

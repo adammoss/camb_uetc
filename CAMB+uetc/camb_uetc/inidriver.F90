@@ -286,19 +286,21 @@
        do_strings =  Ini_Read_Logical('do_strings',.false.)
        use_grid =  Ini_Read_Logical('use_grid',.false.)
        plot_uetc =  Ini_Read_Logical('plot_uetc',.false.)
+       do_VOS3 = Ini_Read_Logical('do_vos3',.false.)
+       do_VOS4 = Ini_Read_Logical('do_vos4',.true.)
 
        P%nmodes =  Ini_Read_Int('nmodes',2)
        P%uetc_n = Ini_Read_Int('uetc_n',100)
        P%uetc_kt_min = Ini_Read_Double('uetc_kt_min',0.01d0)	
        P%uetc_kt_max = Ini_Read_Double('uetc_kt_max',0.01d0)
-       P%mu = Ini_Read_Double('mu',1.0d0)
-       P%xi = Ini_Read_Double('xi',0.13d0)
+       P%cr = Ini_Read_Double('cr',0.23d0)
+       P%cm = Ini_Read_Double('cm',0.18d0)
+       P%g = Ini_Read_Double('g',300.0d0)
+       P%fkr = Ini_Read_Double('fkr',0.17d0)
+       P%fkm = Ini_Read_Double('fkm',0.49d0)
        P%alpha = Ini_Read_Double('alpha',1.9d0)
-       P%v = Ini_Read_Double('v',0.65d0)
-!       P%xi_mat = Ini_Read_Double('xi_mat',0.13d0)
-!       P%alpha_mat = Ini_Read_Double('alpha_mat',1.9d0)
-!       P%v_mat = Ini_Read_Double('v_mat',0.65d0)
        P%L = Ini_Read_Double('L',0.95d0)
+       P%mu = Ini_Read_Double('mu',1.0d0)
        weighting = Ini_Read_Double('weighting',0.0d0)	    
 
        if (outroot /= '') then
@@ -323,6 +325,9 @@
           VectorFileName =  trim(outroot) //Ini_Read_String('vector_output_file')	
        end if
 
+       if (do_VOS4) then
+          do_VOS3=.false.
+       end if
        call Ini_Close
 
        if (.not. CAMB_ValidateParams(P)) stop 'Stopped due to parameter error'

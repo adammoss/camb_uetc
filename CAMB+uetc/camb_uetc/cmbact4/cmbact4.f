@@ -31,19 +31,19 @@ c subroutine initlval in this code.
       common/seed/iseed
       common/volcom/tkmax     
 
-      open(unit=65,file='cl_tt_100.d',
+      open(unit=65,file='../output/data/alpha1/cmbact/cl_tt_no_100.d',
      &	            status='unknown',form='formatted')
      
-      open(unit=66,file='cl_te_100.d',
+      open(unit=66,file='../output/data/alpha1/cmbact/cl_te_no_100.d',
      &	            status='unknown',form='formatted')
      
-      open(unit=67,file='cl_ee_100.d',
+      open(unit=67,file='../output/data/alpha1/cmbact/cl_ee_no_100.d',
      &	            status='unknown',form='formatted')
 
-      open(unit=70,file='cl_bb_100.d',
+      open(unit=70,file='../output/data/alpha1/cmbact/cl_bb_no_100.d',
      &	            status='unknown',form='formatted')
 
-      open(unit=80,file='pk_lin_100.d',
+      open(unit=80,file='../output/data/alpha1/cmbact/pk_lin_no_100.d',
      &	            status='unknown',form='formatted')
 
 c      write(*,*)'hello'
@@ -73,7 +73,7 @@ c Hubble const
       h=0.704d0
       
 c Constant effective wiggliness parameter                  
-      alf=1.9d0
+      alf=1.0d0
 
 c vdev is the initial rms string velocity (over all scales)
       vdev=0.65d0
@@ -557,6 +557,7 @@ c     &              ,evalf(nstep00),evalfpr(nstep00)
       parameter (nw=3)
       parameter (d0hi=1.0d40,d0lo=1.0d40)
 
+      logical do_evolve
       real*8 yev(nw),yevpr(nw)
       dimension c(24),w(nw,9)
               double precision dtauda,adtauda
@@ -567,7 +568,8 @@ c     &              ,evalf(nstep00),evalfpr(nstep00)
       twopi3=(2.0d0*pi)**3
       pi=4.0d0*datan(1.0d0)
 
-
+      do_evolve = .false.
+       
 c  taui is the earliest conformal time at which one scale model is run   
       taui=tau_init
 
@@ -604,13 +606,17 @@ c  and their derivatives.
       do 20 j=1,ntime
       tauend=tim(j)
 
-      call dverk(nvar,fevolve,tau,yev,tauend,tol1
-     &                     ,ind,c,nw,w)
-      call fevolve(nvar,tauend,yev,yevpr)
-      
-      adot=yevpr(1)
-      xl=yev(2)
-      vel=yev(3)
+        if (do_evolve) then
+          call dverk(nvar,fevolve,tau,yev,tauend,tol1,ind,c,nw,w)
+          call fevolve(nvar,tauend,yev,yevpr)
+       
+          adot=yevpr(1)
+          xl=yev(2)
+          vel=yev(3)
+          else
+          xl = xl0
+          vel = vdev
+        endif
 
 c this is used to store t as a function of tau
 

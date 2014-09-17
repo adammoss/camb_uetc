@@ -508,14 +508,19 @@
         !call SetkValuesForSources 
         do_string_source = .true.
 
-        call init_string(SPR)
+        call init_string(SPRa)
 !        call init_string(SPR_mat)
 !        ! Multiply final spectrum by mu^2
-        SPR%mu = 1.0! Params%mu
-        SPR%xi = Params%xi
-        SPR%alpha = Params%alpha
-        SPR%v = Params%v 
-        SPR%L = Params%L
+        SPRa%cr = Params%cr
+        SPRa%cm = Params%cm
+        SPRa%fkr = Params%fkr
+        SPRa%fkm = Params%fkm
+        SPRa%g = Params%g
+        SPRa%mu = Params%mu
+        SPRa%alpha = Params%alpha
+        SPRa%v = dsqrt(Params%fkr/(Params%cr+Params%fkr))
+        SPRa%xi = Params%fkr/(2.0d0*SPRa%v)
+        SPRa%L = Params%L
 !        SPR_mat%mu = 1.0! Params%mu
 !        SPR_mat%xi = Params%xi_mat
 !        SPR_mat%alpha = Params%alpha_mat

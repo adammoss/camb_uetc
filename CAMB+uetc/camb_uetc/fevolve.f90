@@ -3,7 +3,7 @@ subroutine fevolve(SPR,n,x,y,yprime)
   use LambdaGeneral
   use uetc
   implicit none
-  type(StringParams) SPR
+  Type(StringParams) SPR
   integer n
   real(DP) :: x,y(n),yprime(n)
   real(DP) :: a,a2,tau
@@ -33,8 +33,8 @@ subroutine fevolve(SPR,n,x,y,yprime)
    xl=y(2)
    xv=y(3)
    xv2=xv*xv
-   ct=(SPR%cr+a*SPR%g*SPR%cm)/(1.0d0+a*SPR%g)
-   fk=(SPR%fkr+a*SPR%g*SPR%fkm)/(1.0d0+a*SPR%g)
+   ct=(SPRa%cr+a*SPRa%g*SPRa%cm)/(1.0d0+a*SPRa%g)
+   fk=(SPRa%fkr+a*SPRa%g*SPRa%fkm)/(1.0d0+a*SPRa%g)
    xlprime=adotoa*xl*xv2+0.5d0*ct*xv
    xvprime=(1.0d0-xv2)*(fk/xl-2.0d0*adotoa*xv)  
    yprime(2)=xlprime
@@ -69,7 +69,7 @@ subroutine fevolve4(SPR,n,x,y,yprime)
       fk=(2.0d0*dsqrt(2.0d0)/pi1)*&
          (1.0d0-8.0d0*xv**6)/(1.0d0+8.0d0*xv**6)
 
-      xlprime=adotoa*xl*xv2+0.5d0*SPR%cr*xv
+      xlprime=adotoa*xl*xv2+0.5d0*SPRa%cr*xv
       xvprime=(1.0d0-xv2)*(fk/xl-2.0d0*adotoa*xv)
 
       yprime(2)=xlprime
