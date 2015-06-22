@@ -10,12 +10,12 @@ plot_cmbact = 0
 cmbact = ['test_L099']
 ;cmbact = []
 
-filename = ['data/test','data/test2']
+filename = ['data/test','data/test2','data/test3']
 ;filename = ['data/test13','data/test14']
 ;filename = ['data/v02_r5_wmap7_n1024_m256_w025']
 
 ;normalization = [gmu,gmu,gmu,gmu,gmu]
-normalization = [gmu,gmu]
+normalization = [gmu,gmu,gmu]
 
 l_range = [2,3000]
 tt_s_range = [0,100]
