@@ -3,11 +3,12 @@ pro plot_cl
 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 gmu = 2.0d-7
 output = 1
-plot_cmbact = 1
+plot_cmbact = 0
 
 ;cmbact = ['fid_wmap7_500_L099_n500_1','fid_wmap7_500_L099_n500_2','fid_wmap7_500_L099_n500_3','fid_wmap7_500_L099_n500_4']
 
 cmbact = ['test_L099']
+;cmbact = []
 
 filename = ['data/test','data/test2']
 ;filename = ['data/test13','data/test14']
@@ -159,7 +160,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[1,*] = data[1,*]*norm^2
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
-     oplot,data[0,*],data[1,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[1,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{EE} l(l+1)/(2\pi) [\mu K^2]')
@@ -181,7 +182,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[1,*] = data[1,*]*norm^2
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
-     oplot,data[0,*],data[2,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[2,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{BB} l(l+1)/(2\pi) [\mu K^2]')
@@ -207,7 +208,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[1,*] = data[1,*]*norm^2
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
-     oplot,data[0,*],data[3,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[3,*],linestyle=0,color=100+i*10
   endfor
 
   ;=== Vectors
@@ -232,7 +233,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[1,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[1,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{EE} l(l+1)/(2\pi) [\mu K^2]')
@@ -255,7 +256,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[2,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[2,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{BB} l(l+1)/(2\pi) [\mu K^2]')
@@ -278,7 +279,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[3,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[3,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{TE} l(l+1)/(2\pi) [\mu K^2]')
@@ -301,7 +302,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[4,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[4,*],linestyle=0,color=100+i*10
   endfor
 
   ;=== Tensors
@@ -326,7 +327,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[1,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[1,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{EE} l(l+1)/(2\pi) [\mu K^2]')
@@ -349,7 +350,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[2,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[2,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{BB} l(l+1)/(2\pi) [\mu K^2]')
@@ -372,7 +373,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[3,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[3,*],linestyle=0,color=100+i*10
   endfor
 
   ytitle=textoidl('C_l^{TE} l(l+1)/(2\pi) [\mu K^2]')
@@ -395,7 +396,7 @@ print,'Correcting for minus sign in CMBACT vector TE spectra'
      data[2,*] = data[2,*]*norm^2
      data[3,*] = data[3,*]*norm^2
      data[4,*] = data[4,*]*norm^2
-     oplot,data[0,*],data[4,*],linestyle=i+1,color=100+i*10
+     oplot,data[0,*],data[4,*],linestyle=0,color=100+i*10
   endfor
 
   if output eq 1 then begin

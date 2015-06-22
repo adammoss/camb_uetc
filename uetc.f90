@@ -18,6 +18,11 @@ module uetc
   integer :: scaling_option = 2
   integer, parameter :: min_terms = 10
   real, parameter :: scale_terms = 3.0
+  !integer, parameter :: min_terms = 20
+  !real, parameter :: scale_terms = 5.0
+  !real(DP), parameter :: xmin = 0.05d0
+  !real(DP), parameter :: xmax = 20.0d0
+  !real(DP), parameter :: etcmin = 0.1d0
   real(DP), parameter :: xmin = 0.05d0
   real(DP), parameter :: xmax = 20.0d0
   real(DP), parameter :: etcmin = 0.001d0
@@ -134,7 +139,7 @@ contains
     else
        nint = nk
     end if
-
+    
     if (uetc_feedback.gt.0) then
        write(*,*) 'Computing UETC'
        write(*,*) 'N inter: ',nint
@@ -279,6 +284,7 @@ contains
        call Matrix_Diagonalize(scalar_evec_temp,scalar_eval_temp,2*n)   
        call Matrix_Diagonalize(vv_evec_temp,vv_eval_temp,n)
        call Matrix_Diagonalize(tt_evec_temp,tt_eval_temp,n)
+
        do i=1,nmodes
           ss00_eval(ii,i) = scalar_eval_temp(2*n-i+1)
           ss00_evec(ii,i,:) = scalar_evec_temp(1:n,2*n-i+1)
