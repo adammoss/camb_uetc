@@ -1,7 +1,9 @@
 output/data/*
 output/cmbact_data
+output/plots
 *.mod
 *.a
 *.o
 *~
 camb
+.DS_Store

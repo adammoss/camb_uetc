@@ -1717,8 +1717,7 @@ subroutine Matrix_Write_double(aname, mat, forcetable)
 
    integer WorkSize, ierr
    integer,allocatable, dimension (:) :: IWork
-   real(dm), allocatable, dimension (:) :: rv1
-   real(dm) OptWk 
+   real(dm), allocatable, dimension (:) :: rv1 
 
    if (n<=m) call MpiStop('Matrix_SVD_VT assumed n>m. ')
   
@@ -1728,12 +1727,14 @@ subroutine Matrix_Write_double(aname, mat, forcetable)
     !Use divide and conquer
      allocate(IWork(8*MIN(M,N))) 
      WorkSize= -1 !3*min(M,N)*min(M,N) +max(max(M,N),5*min(M,N)*min(M,N)+4*min(M,N))
+     allocate(rv1(1))   ! Temporary allocation for workspace query
 #ifdef MATRIX_SINGLE
-     call SGESDD('O',m,n, Mat, m ,D,U,m,Mat,n,OptWk,WorkSize,IWork,ierr) 
+     call SGESDD('O',m,n, Mat, m ,D,U,m,Mat,n,rv1,WorkSize,IWork,ierr) 
 #else     
-     call DGESDD('O',m,n, Mat, m ,D,U,m,Mat,n,OptWk,WorkSize,IWork,ierr) 
+     call DGESDD('O',m,n, Mat, m ,D,U,m,Mat,n,rv1,WorkSize,IWork,ierr) 
 #endif
-     WorkSize = nint(OptWk)
+     WorkSize = nint(rv1(1))
+     deallocate(rv1)
      allocate(rv1(WorkSize))   
 #ifdef MATRIX_SINGLE
      call SGESDD('O',m,n, Mat, m ,D,U,m,Mat,n,rv1,WorkSize,IWork,ierr) 

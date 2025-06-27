@@ -1,15 +1,52 @@
 ! Code to compute analytic form of USM string UETC
 ! AM, Nottingham, July 2012
-! Uses NAG libraries to compute Sine integral and spherical Bessel function 
+! Updated to use GSL instead of NAG libraries
+! Uses GSL for Sine integral and spherical Bessel function 
 ! Uses LAPACK routine for eigenvector decomposition
 ! Latest version Oct 30 2012
 
 module uetc 
-  USE nag_library, ONLY : nag_wp,s13adf,s17def,s14aaf
+  ! Removed NAG library dependency
   use am_routines
+  use iso_c_binding
   implicit none
   integer, parameter :: DP = kind(1.0D0)
   integer, parameter :: QP = kind(1.0Q0)
+  
+  ! GSL interface declarations
+  interface
+    function gsl_sf_Si(x) bind(c, name='gsl_sf_Si')
+      import c_double
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_Si
+    end function gsl_sf_Si
+    
+    function gsl_sf_bessel_jl(l, x) bind(c, name='gsl_sf_bessel_jl')
+      import c_int, c_double
+      integer(c_int), value :: l
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_bessel_jl
+    end function gsl_sf_bessel_jl
+    
+    function gsl_sf_gamma(x) bind(c, name='gsl_sf_gamma')
+      import c_double
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_gamma
+    end function gsl_sf_gamma
+    
+    function gsl_sf_bessel_J0(x) bind(c, name='gsl_sf_bessel_J0')
+      import c_double
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_bessel_J0
+    end function gsl_sf_bessel_J0
+    
+    function gsl_sf_bessel_J1(x) bind(c, name='gsl_sf_bessel_J1')
+      import c_double
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_bessel_J1
+    end function gsl_sf_bessel_J1
+  end interface
+
   ! Whether to use gridded I1 and I4
   logical :: use_grid = .true.
   real(DP), parameter :: taustart_string = 1.0d0
@@ -876,49 +913,52 @@ end function I6_int
        scaling_factor = 1.0d0
     end select
   end function scaling_factor
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   function spher_bessel(n,x)
     implicit none
     real(DP) spher_bessel
     real(DP) x
     integer n
     real(DP), parameter :: pi = 3.1415926535897932384626433832795d0
-    COMPLEX (KIND=nag_wp)           :: z,cy(1)                      
-    REAL (KIND=nag_wp)              :: fnu                     
-    INTEGER                         :: nz,ifail      
-    CHARACTER (1)                   :: scal     
-    if (n.eq.-1) then
-        spher_bessel=cos(x)/x
+    
+    if (x == 0.0d0) then
+       if (n == 0) then
+          spher_bessel = 1.0d0
+       else
+          spher_bessel = 0.0d0
+       end if
        return
     end if
-    fnu=0.5d0+n
-    z = dcmplx(x,0.0d0)
-    scal='u'
-    ifail=0
-    CALL s17def(fnu,z,1,scal,cy,nz,ifail)
-    if (ifail.ne.0) stop
-    spher_bessel=sqrt(pi/(2.0d0*x))*dreal(cy(1))
+    
+    if (n == -1) then
+       spher_bessel = cos(x)/x
+       return
+    else if (n == -2) then
+       spher_bessel = (sin(x)/x**2 - cos(x)/x)
+       return
+    end if
+    
+    ! Use GSL spherical Bessel function
+    spher_bessel = real(gsl_sf_bessel_jl(n, real(x, c_double)), DP)
   end function spher_bessel
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   function sine_integral(x)
     implicit none
     real(DP) sine_integral
     real(DP) x
-    integer ifail
-    ifail=0
-    sine_integral = s13adf(x,ifail)
-    !call cisi(x,ci,si)
-    !sine_integral = si
-    if (ifail.ne.0) stop
+    
+    ! Use GSL sine integral function
+    sine_integral = real(gsl_sf_si(real(x, c_double)), DP)
   end function sine_integral
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   function factorial(n)
     implicit none
     real(DP) factorial,x
-    integer n,ifail
-    x=1.0d0+n
-    factorial = s14aaf(x,ifail)
-    if (ifail.ne.0) stop
+    integer n
+    x = 1.0d0 + n
+    
+    ! Use GSL gamma function: Gamma(n+1) = n!
+    factorial = real(gsl_sf_gamma(real(x, c_double)), DP)
   end function factorial
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 subroutine Matrix_Diagonalize(M,diag,n)
@@ -1025,18 +1065,38 @@ end module uetc
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 function I1_integrand(x1,x2,rho,theta)
   use Precision
+  use iso_c_binding
   implicit none
   real(dl) I1_integrand,theta,x1,x2,rho
+  
+  interface
+    function gsl_sf_bessel_J0(x) bind(c, name='gsl_sf_bessel_J0')
+      import c_double
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_bessel_J0
+    end function gsl_sf_bessel_J0
+  end interface
+  
   I1_integrand = sin(theta)/cos(theta)**2*sin(x1/2.0d0*cos(theta))*sin(x2/2.0d0*cos(theta))* &
-       BESSEL_J0(rho*sin(theta))
+       real(gsl_sf_bessel_J0(real(rho*sin(theta), c_double)), dl)
 end function I1_integrand
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 function I4_integrand(x1,x2,rho,theta)
   use Precision
+  use iso_c_binding
   implicit none
   real(dl) I4_integrand,theta,x1,x2,rho
+  
+  interface
+    function gsl_sf_bessel_J1(x) bind(c, name='gsl_sf_bessel_J1')
+      import c_double
+      real(c_double), value :: x
+      real(c_double) :: gsl_sf_bessel_J1
+    end function gsl_sf_bessel_J1
+  end interface
+  
   I4_integrand = sin(theta)/cos(theta)**2*sin(x1/2.0d0*cos(theta))*sin(x2/2.0d0*cos(theta))* &
-       BESSEL_J1(rho*sin(theta))/(rho*sin(theta))
+       real(gsl_sf_bessel_J1(real(rho*sin(theta), c_double)), dl)/(rho*sin(theta))
 end function I4_integrand
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  function rombint_mod(x1,x2,x3,f,a,b,tol, maxit)
@@ -1047,6 +1107,7 @@ end function I4_integrand
 !  routine.  tol indicates the desired relative accuracy in the integral.
 !
         implicit none
+        real(dl) :: rombint_mod
         integer, intent(in), optional :: maxit
         integer :: MAXITER=20
         integer, parameter :: MAXJ=5
@@ -1054,7 +1115,6 @@ end function I4_integrand
         real(dl) x1,x2,x3 !dummy
         real(dl) f
         external f
-        real(dl) :: rombint_mod
         real(dl), intent(in) :: a,b,tol
         integer :: nint, i, k, jmax, j
         real(dl) :: h, gmax, error, g, g0, g1, fourj
