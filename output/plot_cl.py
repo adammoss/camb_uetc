@@ -16,11 +16,42 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
+def fix_fortran_scientific_notation(text):
+    """Fix Fortran scientific notation that's missing 'E'."""
+    import re
+    # Pattern to match numbers like 0.38082-102 or 1.23456+45
+    # This matches: optional minus, digits, decimal point, digits, then +/- followed by digits
+    pattern = r'(\d+\.?\d*)([+-])(\d+)(?![E\d\.])'
+    
+    def replace_func(match):
+        mantissa = match.group(1)
+        sign = match.group(2)
+        exponent = match.group(3)
+        return f"{mantissa}E{sign}{exponent}"
+    
+    return re.sub(pattern, replace_func, text)
+
 def load_cls_data(filename):
-    """Load Cls data from file."""
+    """Load Cls data from file, handling Fortran scientific notation."""
     try:
-        data = np.loadtxt(filename)
-        return data
+        # First try normal loading
+        try:
+            data = np.loadtxt(filename)
+            return data
+        except ValueError:
+            # If that fails, try fixing the scientific notation
+            print(f"Fixing Fortran scientific notation in {filename}...")
+            with open(filename, 'r') as f:
+                content = f.read()
+            
+            # Fix the scientific notation
+            fixed_content = fix_fortran_scientific_notation(content)
+            
+            # Parse the fixed content
+            from io import StringIO
+            data = np.loadtxt(StringIO(fixed_content))
+            return data
+            
     except FileNotFoundError:
         print(f"Warning: File {filename} not found")
         return None
@@ -74,24 +105,25 @@ def plot_cls(root_name='test', data_dir='data', output_dir='plots'):
     if scal_data is not None:
         l_scal = scal_data[:, 0]
         tt_scal = scal_data[:, 1]
-        ax.loglog(l_scal, tt_scal * normalization, 
+        ax.semilogx(l_scal, tt_scal * normalization, 
                  color=colors['scalar'], linewidth=2, label='Scalar')
     
     if vec_data is not None:
         l_vec = vec_data[:, 0]
         tt_vec = vec_data[:, 1]
-        ax.loglog(l_vec, tt_vec * normalization, 
+        ax.semilogx(l_vec, tt_vec * normalization, 
                  color=colors['vector'], linewidth=2, label='Vector')
     
     if tens_data is not None:
         l_tens = tens_data[:, 0]
         tt_tens = tens_data[:, 1]
-        ax.loglog(l_tens, tt_tens * normalization, 
+        ax.semilogx(l_tens, tt_tens * normalization, 
                  color=colors['tensor'], linewidth=2, label='Tensor')
     
     ax.set_xlabel(r'$\ell$')
     ax.set_ylabel(r'$\ell(\ell+1)C_\ell^{TT} \cdot G\mu^2/(2\pi)$ [$\mu$K$^2$]')
     ax.set_title('Temperature (TT)', fontweight='bold')
+    ax.set_ylim(bottom=1e-10)
     ax.grid(True, alpha=0.3)
     ax.legend()
     
@@ -99,17 +131,17 @@ def plot_cls(root_name='test', data_dir='data', output_dir='plots'):
     ax = axes[0, 1]
     if scal_data is not None and scal_data.shape[1] > 2:
         ee_scal = scal_data[:, 2]
-        ax.loglog(l_scal, ee_scal * normalization, 
+        ax.semilogx(l_scal, ee_scal * normalization, 
                  color=colors['scalar'], linewidth=2, label='Scalar')
     
     if vec_data is not None and vec_data.shape[1] > 2:
         ee_vec = vec_data[:, 2]
-        ax.loglog(l_vec, ee_vec * normalization, 
+        ax.semilogx(l_vec, ee_vec * normalization, 
                  color=colors['vector'], linewidth=2, label='Vector')
     
     if tens_data is not None and tens_data.shape[1] > 2:
         ee_tens = tens_data[:, 2]
-        ax.loglog(l_tens, ee_tens * normalization, 
+        ax.semilogx(l_tens, ee_tens * normalization, 
                  color=colors['tensor'], linewidth=2, label='Tensor')
     
     ax.set_xlabel(r'$\ell$')
@@ -125,14 +157,14 @@ def plot_cls(root_name='test', data_dir='data', output_dir='plots'):
         # Only plot positive values for log scale
         mask_vec = bb_vec > 0
         if np.any(mask_vec):
-            ax.loglog(l_vec[mask_vec], bb_vec[mask_vec] * normalization, 
+            ax.semilogx(l_vec[mask_vec], bb_vec[mask_vec] * normalization, 
                      color=colors['vector'], linewidth=2, label='Vector')
     
     if tens_data is not None and tens_data.shape[1] > 3:
         bb_tens = tens_data[:, 3]
         mask_tens = bb_tens > 0
         if np.any(mask_tens):
-            ax.loglog(l_tens[mask_tens], bb_tens[mask_tens] * normalization, 
+            ax.semilogx(l_tens[mask_tens], bb_tens[mask_tens] * normalization, 
                      color=colors['tensor'], linewidth=2, label='Tensor')
     
     ax.set_xlabel(r'$\ell$')

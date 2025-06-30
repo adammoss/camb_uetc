@@ -367,9 +367,24 @@ contains
           close(51)
           close(52)
           close(53)
-          open(unit=50,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_evec.dat')
+          open(unit=50,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_ss00_evec.dat')
+          do i=1,n
+             write(50,'(5000E15.5)') ss00_evec(ii,i,:)
+          end do
+          close(50)
+          open(unit=50,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_ss_evec.dat')
+          do i=1,n
+             write(50,'(5000E15.5)') ss_evec(ii,i,:)
+          end do
+          close(50)
+          open(unit=50,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_vv_evec.dat')
           do i=1,n
              write(50,'(5000E15.5)') vv_evec(ii,i,:)
+          end do
+          close(50)
+          open(unit=50,file = trim(uetc_file)//'_'//trim(IntToStr(ii))//'_tt_evec.dat')
+          do i=1,n
+             write(50,'(5000E15.5)') tt_evec(ii,i,:)
           end do
           close(50)
        end if
